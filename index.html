@@ -589,79 +589,13 @@
         };
 
         // ========== URL GOOGLE APPS SCRIPT ANDA ==========
-        var GAS_URL = "https://script.google.com/macros/s/AKfycbwvN3qMDqJ60OvauB4DkuKoZvSXMnkFxs-Q-410NRy2wdek4cCC_O_IQ50Eyae61FXJ2g/exec";
+        // Jika kode ini berjalan langsung di GAS, URL ini akan diabaikan dan memakai jalur VIP (google.script.run)
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbz9Jb1aI-1kJYGjE9QorsD8PVWKZ4EiZqi1qsj8j7FsCJH9gSpWvSGSSRNDbLBLwUvw/exec";
 
         var Server = {
             panggil: function(namaFungsi, args, sukses, gagal) {
-                var jalankanSimulasi = function() {
-                    setTimeout(function() {
-                        if (namaFungsi === 'loginAdmin') {
-                            if (args && args[0] === '12345') sukses({status: 'success', nama: 'Admin Lokal'}); else sukses({status: 'error', message: 'Gunakan NIY 12345'});
-                        }
-                        else if (namaFungsi === 'catatAbsensi') sukses({status: 'success', message: 'Simulasi absen berhasil'});
-                        else if (namaFungsi === 'getRekapData') sukses([]);
-                        else if (namaFungsi === 'getDashboardData') {
-                            var tReq = (args && args[0]) ? args[0] : new Date().getFullYear();
-                            sukses({ totalSiswa: 320, totalKelas: 12, putra: 155, putri: 165, kehadiranBulanIni: [6800, 150, 90, 120], availableYears: [tReq-1, tReq, tReq+1], trenBulanan: { hadir: [224, 202, 203, 213, 223, 193, 224, 213, 200, 223, 201, 212], terlambat: [3, 10, 5, 8, 4, 12, 5, 6, 8, 10, 5, 6], izinSakit: [5, 4, 8, 3, 5, 6, 4, 5, 2, 4, 3, 5], alpa: [0, 2, 1, 1, 1, 1, 1, 0, 0, 2, 3, 2] } });
-                        }
-                        else if (namaFungsi === 'getDataSiswa') {
-                            var dummySiswa = [];
-                            for(var i=1; i<=25; i++) dummySiswa.push({nisn: '100'+i, nama: 'Siswa Contoh ' + i, kelas: (i%2===0?'VII-A':'VIII-A'), wa: '081', foto: '', rfid: 'A1B2C3D' + i});
-                            sukses(dummySiswa);
-                        }
-                        else if (namaFungsi === 'getDaftarKelas') sukses(['VII-A', 'VIII-A']);
-                        else if (namaFungsi === 'inputIzinSiswa') sukses({status: 'success', message: 'Simulasi input sukses'});
-                        else if (namaFungsi === 'getPengaturan') {
-                            sukses({token: 'DUMMY', template: 'Ananda [NAMA] telah hadir pada [WAKTU]', batasMulai: '06:00', batasWaktu: '07:00', kota: 'Pamekasan', waliKelasData: {}});
-                        }
-                        else if (namaFungsi === 'simpanPengaturan') sukses({status: 'success', message: 'Simulasi simpan Pengaturan berhasil'});
-                        else if (namaFungsi === 'getRekapBulanan') {
-                            var dr = [];
-                            for(var i=1; i<=15; i++) {
-                                var r = {nisn:'100'+i, nama:'Siswa Contoh '+i, kelas:(i%2===0?'VII-A':'VIII-A'), absensi:{}, statBulan: {H: 20, TL: 2, I: 1, S: 0, A: 0}, statTahun: {H: 150, TL: 10, I: 5, S: 2, A: 1}, statPerBulan: {}};
-                                for(var m=1; m<=12; m++) r.statPerBulan[m] = {H:10, TL:1, I:0, S:0, A:0};
-                                r.absensi[1] = 'Hadir'; r.absensi[2] = 'Terlambat'; r.absensi[6] = 'Hadir'; r.absensi[7] = 'Izin';
-                                dr.push(r);
-                            }
-                            sukses(dr);
-                        }
-                        else if (namaFungsi === 'getRekapIndividu') {
-                            var yrStats = {}; for(var m=1; m<=12; m++) yrStats[m] = {H:15, TL:1, I:1, S:0, A:0};
-                            var logData = [ {tanggal: '12/03/'+(args && args[1] ? args[1] : new Date().getFullYear()), status: 'Izin', ket: 'Acara keluarga'}, {tanggal: '15/03/'+(args && args[1] ? args[1] : new Date().getFullYear()), status: 'Terlambat', ket: '-'} ];
-                            sukses({ profile: { nama: 'Siswa Contoh ' + (args && args[0] ? args[0] : '1'), nisn: (args && args[0] ? args[0] : '1'), kelas: 'VII-A', foto: '' }, statsTahunan: yrStats, logDetail: logData });
-                        }
-                        else sukses({status: 'success', message: 'Aksi simulasi sukses'});
-                    }, 300);
-                };
-
-                if (GAS_URL && GAS_URL !== "") {
-                    fetch(GAS_URL, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Menghindari block CORS
-                        body: JSON.stringify({ action: namaFungsi, args: args || [] })
-                    })
-                    .then(function(res) { 
-                        if (!res.ok) throw new Error("HTTP " + res.status);
-                        return res.text(); 
-                    })
-                    .then(function(text) {
-                        try {
-                            var data = JSON.parse(text);
-                            if (data && data.error) {
-                                if (gagal) gagal(data.error);
-                            } else {
-                                if (sukses) sukses(data);
-                            }
-                        } catch(e) {
-                            throw new Error("Invalid JSON dari server.");
-                        }
-                    })
-                    .catch(function(err) {
-                        console.warn("Koneksi Server Error (" + namaFungsi + "):", err);
-                        console.info("Beralih ke Data Simulasi karena gagal menghubungi server.");
-                        jalankanSimulasi();
-                    });
-                } else if (typeof google !== 'undefined' && google.script && google.script.run) {
+                // PRIORITAS 1: Jika dihosting langsung di Apps Script (Menampilkan data asli secara langsung)
+                if (typeof google !== 'undefined' && google.script && google.script.run) {
                     var exec = google.script.run;
                     if (sukses) exec = exec.withSuccessHandler(sukses);
                     if (gagal) exec = exec.withFailureHandler(gagal);
@@ -683,9 +617,38 @@
                         else if (namaFungsi === 'getRekapBulanan') exec.getRekapBulanan(args[0], args[1], args[2]);
                         else if (namaFungsi === 'getRekapIndividu') exec.getRekapIndividu(args[0], args[1]);
                     } catch(err) { if (gagal) gagal(String(err)); }
+                } 
+                // PRIORITAS 2: Jika berjalan di Vercel (Menghubungi GAS_URL)
+                else if (GAS_URL && GAS_URL !== "") {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        redirect: 'follow', 
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
+                        body: JSON.stringify({ action: namaFungsi, args: args || [] })
+                    })
+                    .then(function(res) { 
+                        if (!res.ok) throw new Error("HTTP " + res.status);
+                        return res.text(); 
+                    })
+                    .then(function(text) {
+                        try {
+                            var data = JSON.parse(text);
+                            if (data && data.error) {
+                                if (gagal) gagal(data.error);
+                            } else {
+                                if (sukses) sukses(data);
+                            }
+                        } catch(e) {
+                            throw new Error("Format respon tidak valid (bukan JSON).");
+                        }
+                    })
+                    .catch(function(err) {
+                        console.error("Koneksi Server Error (" + namaFungsi + "):", err);
+                        // Pesan error jika Gagal terkoneksi dari Vercel
+                        if (gagal) gagal("Koneksi ditolak oleh server (CORS Error). Untuk melihat data aslinya, harap buka aplikasi ini langsung melalui link Google Apps Script Anda.");
+                    });
                 } else {
-                    console.warn("Server terputus, masuk ke Mode Simulasi");
-                    jalankanSimulasi();
+                    if (gagal) gagal("Error: URL Database (GAS_URL) belum diatur!");
                 }
             }
         };
