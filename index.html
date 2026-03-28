@@ -41,6 +41,19 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .print-only-signature { display: none !important; }
 
+        div:where(.swal2-container) div:where(.swal2-popup) {
+            width: 88% !important; 
+            max-width: 380px !important; 
+            border-radius: 1.5rem !important; 
+            padding: 1.25rem !important; 
+        }
+        div:where(.swal2-container) h2:where(.swal2-title) {
+            font-size: 1.15rem !important; 
+        }
+        div:where(.swal2-container) div:where(.swal2-html-container) {
+            margin: 1em 0 0.5em !important; 
+        }
+
         @media print {
             body { background: white !important; color: black !important; margin: 0; padding: 0; animation: none; font-family: Arial, sans-serif !important; }
             .dark body { background: white !important; color: black !important; }
@@ -98,10 +111,10 @@
 
     <noscript><div style="background: red; color: white; padding: 20px; text-align: center; font-weight: bold; z-index: 9999; position: relative;">JAVASCRIPT DIBLOKIR. Harap aktifkan Javascript di browser Anda.</div></noscript>
 
-    <nav class="relative z-50 bg-gradient-to-r from-brand-900 to-brand-800 shadow-md text-white border-b border-brand-700 border-opacity-50 dark:from-gray-900 dark:to-gray-800 dark:border-gray-800">
+    <nav class="sticky top-0 z-50 bg-gradient-to-r from-brand-900 to-brand-800 shadow-md text-white border-b border-brand-700 border-opacity-50 dark:from-gray-900 dark:to-gray-800 dark:border-gray-800">
         <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
             <div class="flex items-center space-x-3">
-                <div class="bg-white p-1 rounded-full shadow-sm"><img src="https://i.ibb.co.com/x8dxgrF9/Logo-SMP-Unggulan-Abu-Zairi.png" alt="Logo SMP" class="h-9 w-9 object-contain"></div>
+                <div class="bg-white p-1 rounded-full shadow-sm"><img id="header-logo" src="https://i.ibb.co.com/VY4pcndf/age.png" alt="Logo SMP" class="h-9 w-9 object-contain rounded-full"></div>
                 <div><h1 class="font-extrabold text-lg tracking-wide leading-tight">ABZENSI</h1><p class="text-[9px] text-brand-200 uppercase tracking-widest font-semibold dark:text-gray-400">SMP Unggulan Abu Zairi</p></div>
             </div>
             <div class="flex items-center space-x-4">
@@ -111,9 +124,8 @@
         </div>
     </nav>
 
-    <main class="flex-grow w-full px-4 py-6 flex flex-col items-center">
+    <main class="flex-grow w-full px-4 py-6 flex flex-col items-center relative">
 
-        <!-- ================= VIEW 1: ABSENSI ================= -->
         <section id="view-absen" class="view-section active w-full max-w-md mx-auto">
             <div class="glass-card rounded-2xl p-8 w-full text-center shadow-lg">
                 <img src="https://i.ibb.co.com/x8dxgrF9/Logo-SMP-Unggulan-Abu-Zairi.png" alt="Logo Sekolah" class="h-16 w-auto mx-auto mb-4 drop-shadow-md">
@@ -160,7 +172,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 2: LOGIN ADMIN ================= -->
         <section id="view-login" class="view-section w-full max-w-md mx-auto">
             <div class="glass-card rounded-2xl p-8 w-full mt-4 shadow-lg">
                 <div class="text-center mb-8">
@@ -179,7 +190,6 @@
             </div>
         </section>
 
-        <!-- ================= VIEW 3: ADMIN DASHBOARD ================= -->
         <section id="view-admin" class="view-section w-full max-w-6xl mx-auto pb-24 md:pb-0">
             <div class="hidden md:flex glass-card rounded-2xl p-4 w-full mb-6 mt-2 justify-between items-center relative z-10 print:hidden shadow-sm">
                 <div class="flex items-center space-x-4">
@@ -195,15 +205,6 @@
                 </div>
             </div>
 
-            <div class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg dark:bg-gray-900/90 border-t border-gray-200 dark:border-gray-800 flex justify-around items-center pt-2 pb-5 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-50 print:hidden">
-                <button type="button" data-action="keTab" data-target="tab-dashboard" class="tab-btn active flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover" data-active="true"><i class="fa-solid fa-chart-pie text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Dashboard</span></button>
-                <button type="button" data-action="keTab" data-target="tab-siswa" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-users text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Siswa</span></button>
-                <button type="button" data-action="keTab" data-target="tab-rekap" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-clipboard-list text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Rekap</span></button>
-                <button type="button" data-action="keTab" data-target="tab-setup" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-gear text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Setup</span></button>
-                <button type="button" data-action="keluarAdmin" class="flex flex-col items-center justify-center w-full py-2 text-rose-400 smooth-hover relative z-20"><i class="fa-solid fa-power-off text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Keluar</span></button>
-            </div>
-
-            <!-- TAB 1: DASHBOARD -->
             <div id="tab-dashboard" class="tab-content active w-full">
                 <div class="flex justify-between items-center mb-6 mt-2">
                     <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i> Dashboard</h3>
@@ -285,7 +286,6 @@
                 </div>
             </div>
 
-            <!-- TAB 2: SISWA -->
             <div id="tab-siswa" class="tab-content w-full">
                 <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
@@ -314,7 +314,6 @@
                 </div>
             </div>
 
-            <!-- TAB 3: REKAP ABSEN -->
             <div id="tab-rekap" class="tab-content w-full">
                 
                 <div class="flex space-x-2 mb-4 print:hidden bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl w-fit border border-gray-200 dark:border-gray-700">
@@ -439,15 +438,20 @@
                                         </table>
                                     </div>
                                 </div>
-                                <div class="print:hidden">
+                                <div class="print:hidden flex flex-col h-full">
                                     <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-2 border-b-2 border-rose-200 dark:border-rose-800 pb-1">Log Indisipliner & Keterangan</h4>
-                                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-h-[360px] relative">
+                                    <div id="wrap-table-log" class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm relative flex-grow">
                                         <table class="w-full text-xs text-left border-collapse">
                                             <thead id="thead-individu-log" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-600 sticky top-0 z-10">
                                                 <tr><th class="p-2 w-10 text-center">No</th><th class="p-2 w-24 text-center">Tanggal</th><th class="p-2 w-24 text-center">Status</th><th class="p-2">Keterangan Opsional</th></tr>
                                             </thead>
                                             <tbody id="tbody-individu-log" class="text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"></tbody>
                                         </table>
+                                    </div>
+                                    <div id="pagination-log-individu" class="flex justify-between items-center px-3 py-2 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-xl bg-gray-50/50 dark:bg-gray-800/50 hidden">
+                                        <button type="button" data-action="prevLogIndividu" id="btn-prev-log" class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-[10px] font-semibold rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 smooth-hover disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"><i class="fa-solid fa-chevron-left mr-1.5 pointer-events-none"></i> Prev</button>
+                                        <span id="info-page-log" class="text-[10px] font-semibold text-gray-500 dark:text-gray-400">Hal 1 dari 1</span>
+                                        <button type="button" data-action="nextLogIndividu" id="btn-next-log" class="relative inline-flex items-center px-3 py-1.5 border border-gray-300 dark:border-gray-600 text-[10px] font-semibold rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 smooth-hover disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">Next <i class="fa-solid fa-chevron-right ml-1.5 pointer-events-none"></i></button>
                                     </div>
                                 </div>
                             </div>
@@ -462,7 +466,6 @@
 
             </div>
 
-            <!-- TAB 4: SETUP -->
             <div id="tab-setup" class="tab-content w-full">
                 <div class="glass-card rounded-2xl p-8 mb-4 max-w-3xl mx-auto shadow-lg">
                     <div class="text-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
@@ -484,12 +487,6 @@
                         <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
                             <h4 class="font-bold text-gray-800 dark:text-white mb-4 text-sm flex items-center"><i class="fa-solid fa-file-signature text-brand-500 mr-2.5 text-lg"></i> Informasi Lembar Cetak (PDF)</h4>
                             <div class="space-y-4">
-                                <div class="flex flex-col sm:flex-row gap-4 mb-4">
-                                    <div class="w-full sm:w-1/2">
-                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Kota/Kabupaten</label>
-                                        <input type="text" id="setup-kota" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all" placeholder="Misal: Surabaya">
-                                    </div>
-                                </div>
                                 <div class="flex flex-col sm:flex-row gap-4 border-t border-gray-100 dark:border-gray-700 pt-4">
                                     <div class="w-full sm:w-1/2">
                                         <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Pilih Kelas</label>
@@ -502,7 +499,7 @@
                                         <input type="text" id="setup-wali" disabled class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all" placeholder="Pilih kelas dahulu...">
                                     </div>
                                 </div>
-                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Data wali kelas akan disesuaikan dengan rekap kelas yang dicetak ke PDF.</p>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Data wali kelas akan disesuaikan dengan rekap kelas yang dicetak ke PDF. (Tempat cetak otomatis Bondowoso)</p>
                             </div>
                         </div>
 
@@ -511,18 +508,23 @@
                             <div class="mb-5 p-3.5 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800/50 flex items-start">
                                 <i class="fa-solid fa-circle-info mt-0.5 mr-3 text-brand-500"></i> 
                                 <div class="text-xs text-brand-800 dark:text-brand-200 leading-relaxed">
-                                    <b>Status Aturan Aktif:</b> Presensi dibuka mulai <span id="display-batas-mulai" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span>. Melewati jam <span id="display-batas-waktu" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span> dianggap terlambat.
+                                    <b>Status Aturan Aktif:</b> Presensi dibuka mulai <span id="display-batas-mulai" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span>. Melewati jam <span id="display-batas-waktu" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span> dianggap terlambat.<br>
+                                    <span class="text-rose-600 dark:text-rose-400 font-semibold mt-1.5 inline-block"><i class="fa-solid fa-triangle-exclamation mr-1"></i>Melewati jam <span id="display-batas-akhir" class="font-bold border-b border-rose-300 dark:border-rose-600 pb-0.5">--:--</span> absen akan ditolak otomatis.</span>
                                 </div>
                             </div>
                             <div class="space-y-4">
                                 <div class="flex flex-col sm:flex-row gap-4">
-                                    <div class="w-full sm:w-1/2">
-                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Jam Mulai Buka Absen</label>
+                                    <div class="w-full sm:w-1/3">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Buka Absen</label>
                                         <input type="time" id="setup-batas-mulai" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all">
                                     </div>
-                                    <div class="w-full sm:w-1/2">
-                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Batas Tepat Waktu</label>
+                                    <div class="w-full sm:w-1/3">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Batas Tepat</label>
                                         <input type="time" id="setup-batas-waktu" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all">
+                                    </div>
+                                    <div class="w-full sm:w-1/3">
+                                        <label class="text-[11px] font-bold text-rose-500 dark:text-rose-400 uppercase tracking-wider mb-1.5 block">Tutup (Tolak)</label>
+                                        <input type="time" id="setup-batas-akhir" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-rose-500 focus:ring-1 focus:ring-rose-500 text-sm font-medium transition-all">
                                     </div>
                                 </div>
                             </div>
@@ -547,6 +549,21 @@
                 </div>
             </div>
         </section>
+
+        <div id="mobile-nav-footer" class="hidden md:hidden fixed bottom-1 left-4 right-4 bg-white/95 backdrop-blur-lg dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700 justify-around items-center py-1 px-2 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.15)] print:hidden" style="z-index: 50 !important;">
+            <button type="button" data-action="keTab" data-target="tab-dashboard" class="tab-btn active flex flex-col items-center justify-center w-full py-1 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover" data-active="true"><i class="fa-solid fa-chart-pie text-xl mb-0.5 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Dashboard</span></button>
+            <button type="button" data-action="keTab" data-target="tab-siswa" class="tab-btn flex flex-col items-center justify-center w-full py-1 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-users text-xl mb-0.5 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Siswa</span></button>
+            <button type="button" data-action="keTab" data-target="tab-rekap" class="tab-btn flex flex-col items-center justify-center w-full py-1 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-clipboard-list text-xl mb-0.5 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Rekap</span></button>
+            <button type="button" data-action="keTab" data-target="tab-setup" class="tab-btn flex flex-col items-center justify-center w-full py-1 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-gear text-xl mb-0.5 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Setup</span></button>
+            <button type="button" data-action="keluarAdmin" class="flex flex-col items-center justify-center w-full py-1 text-rose-400 smooth-hover relative z-20"><i class="fa-solid fa-power-off text-xl mb-0.5 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Keluar</span></button>
+        </div>
+
+        <footer id="main-footer" class="w-full text-center py-6 mt-auto z-40 print:hidden transition-opacity duration-300">
+            <p class="text-xs text-gray-500 dark:text-gray-400 font-semibold tracking-wide">
+                Made with <i class="fa-solid fa-heart text-rose-500 animate-pulse mx-1 text-sm inline-block transform scale-110"></i> Kabag IT P2S Abu Zairi
+            </p>
+        </footer>
+
     </main>
 
     <script>
@@ -555,8 +572,9 @@
             kamera: null, kameraAktif: false, nfcController: null,
             dataSiswa: [], dataSiswaAbsen: [], pChart: null, bChart: null,
             currentPageSiswa: 1, itemsPerPageSiswa: 10,
+            dataLogIndividu: [], currentPageLogIndividu: 1, itemsPerPageLogIndividu: 12,
             siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false,
-            kota: 'Surabaya', waliKelasData: {}
+            waliKelasData: {}
         };
 
         function getNamaBulan(m) {
@@ -588,14 +606,40 @@
             }
         };
 
-        // ========== URL GOOGLE APPS SCRIPT ANDA ==========
-        // Jika kode ini berjalan langsung di GAS, URL ini akan diabaikan dan memakai jalur VIP (google.script.run)
-        var GAS_URL = "https://script.google.com/macros/s/AKfycbz9Jb1aI-1kJYGjE9QorsD8PVWKZ4EiZqi1qsj8j7FsCJH9gSpWvSGSSRNDbLBLwUvw/exec";
+        // ==========================================================
+        // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
+        // ==========================================================
+        var GAS_API_URL = "https://script.google.com/macros/s/AKfycbyO3o5Y6oBgWclTmwNgwnKzkg72Ea65bb7IvU0TmkeVuz2LV_ToQerz7qXXEfMjSwBtqA/exec"; 
 
         var Server = {
             panggil: function(namaFungsi, args, sukses, gagal) {
-                // PRIORITAS 1: Jika dihosting langsung di Apps Script (Menampilkan data asli secara langsung)
-                if (typeof google !== 'undefined' && google.script && google.script.run) {
+                // Mengecek apakah URL API sudah diisi
+                if (GAS_API_URL && GAS_API_URL !== "URL_WEB_APP_ANDA_DISINI" && GAS_API_URL !== "") {
+                    
+                    fetch(GAS_API_URL, {
+                        method: 'POST',
+                        // Harus text/plain agar tidak diblokir oleh sistem CORS Google
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                        body: JSON.stringify({ action: namaFungsi, args: args || [] }),
+                        redirect: 'follow' 
+                    })
+                    .then(function(response) {
+                        return response.json();
+                    })
+                    .then(function(res) {
+                        if (res.status === 'success') {
+                            if (sukses) sukses(res.data);
+                        } else {
+                            if (gagal) gagal(res.message);
+                        }
+                    })
+                    .catch(function(err) {
+                        if (gagal) gagal("Error koneksi server API: " + err.message);
+                        console.error("API Fetch Error:", err);
+                    });
+
+                } else if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    // Fallback jika dibuka langsung dari AppScript (URL script.google.com/...)
                     var exec = google.script.run;
                     if (sukses) exec = exec.withSuccessHandler(sukses);
                     if (gagal) exec = exec.withFailureHandler(gagal);
@@ -617,38 +661,10 @@
                         else if (namaFungsi === 'getRekapBulanan') exec.getRekapBulanan(args[0], args[1], args[2]);
                         else if (namaFungsi === 'getRekapIndividu') exec.getRekapIndividu(args[0], args[1]);
                     } catch(err) { if (gagal) gagal(String(err)); }
-                } 
-                // PRIORITAS 2: Jika berjalan di Vercel (Menghubungi GAS_URL)
-                else if (GAS_URL && GAS_URL !== "") {
-                    fetch(GAS_URL, {
-                        method: 'POST',
-                        redirect: 'follow', 
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, 
-                        body: JSON.stringify({ action: namaFungsi, args: args || [] })
-                    })
-                    .then(function(res) { 
-                        if (!res.ok) throw new Error("HTTP " + res.status);
-                        return res.text(); 
-                    })
-                    .then(function(text) {
-                        try {
-                            var data = JSON.parse(text);
-                            if (data && data.error) {
-                                if (gagal) gagal(data.error);
-                            } else {
-                                if (sukses) sukses(data);
-                            }
-                        } catch(e) {
-                            throw new Error("Format respon tidak valid (bukan JSON).");
-                        }
-                    })
-                    .catch(function(err) {
-                        console.error("Koneksi Server Error (" + namaFungsi + "):", err);
-                        // Pesan error jika Gagal terkoneksi dari Vercel
-                        if (gagal) gagal("Koneksi ditolak oleh server (CORS Error). Untuk melihat data aslinya, harap buka aplikasi ini langsung melalui link Google Apps Script Anda.");
-                    });
                 } else {
-                    if (gagal) gagal("Error: URL Database (GAS_URL) belum diatur!");
+                    // Mencegah error jika URL belum diisi saat dibuka di localhost / Vercel
+                    if (gagal) gagal("URL GAS_API_URL di dalam file index.html belum diisi! Silakan lengkapi terlebih dahulu.");
+                    console.error("URL GAS_API_URL belum diisi!");
                 }
             }
         };
@@ -681,8 +697,20 @@
             for(var i=0; i<els.length; i++) els[i].classList.remove('active');
             var target = document.getElementById(id);
             if (target) target.classList.add('active');
-            var f = document.getElementById('main-footer');
-            if(f) f.style.display = (id === 'view-admin') ? 'none' : 'block';
+            
+            var mobNav = document.getElementById('mobile-nav-footer');
+            var mainFooter = document.getElementById('main-footer');
+            var headerLogo = document.getElementById('header-logo');
+            
+            if (id === 'view-admin') {
+                if (mobNav) { mobNav.classList.remove('hidden'); mobNav.classList.add('flex'); }
+                if (mainFooter) { mainFooter.classList.add('hidden'); }
+                if (headerLogo) { headerLogo.src = 'https://i.ibb.co.com/1JqPCzxP/logo-grup-smp.jpg'; }
+            } else {
+                if (mobNav) { mobNav.classList.add('hidden'); mobNav.classList.remove('flex'); }
+                if (mainFooter) { mainFooter.classList.remove('hidden'); }
+                if (headerLogo) { headerLogo.src = 'https://i.ibb.co.com/VY4pcndf/age.png'; }
+            }
         }
 
         function keTab(idTab) {
@@ -744,6 +772,12 @@
             var infoMob = document.getElementById('mobile-admin-info');
             if (infoMob) { infoMob.classList.add('hidden'); infoMob.classList.remove('block'); }
             State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false;
+            
+            var inpWali = document.getElementById('setup-wali');
+            if (inpWali) { inpWali.value = ''; inpWali.disabled = true; }
+            
+            State.waliKelasData = {};
+            
             keHalaman('view-absen'); Swal.fire({ icon: 'success', title: 'Keluar', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
         }
 
@@ -921,9 +955,22 @@
             Server.panggil('getRekapData', [], function(data) {
                 State.rekapLogLoaded = true;
                 if(!data || data.length === 0) return list.innerHTML = '<li class="p-4 text-center text-gray-400 text-xs">Belum ada data kehadiran.</li>';
-                var isi = ''; var maxItem = Math.min(data.length, 5); 
+                
+                var today = new Date();
+                var tglHariIni = ("0" + today.getDate()).slice(-2) + "/" + ("0" + (today.getMonth() + 1)).slice(-2) + "/" + today.getFullYear();
+                
+                var dataHariIni = [];
+                for(var k=0; k<data.length; k++) {
+                    if(data[k].waktu && data[k].waktu.indexOf(tglHariIni) > -1) {
+                        dataHariIni.push(data[k]);
+                    }
+                }
+                
+                if (dataHariIni.length === 0) return list.innerHTML = '<li class="p-4 text-center text-gray-400 text-xs">Belum ada log presensi untuk hari ini.</li>';
+
+                var isi = ''; var maxItem = Math.min(dataHariIni.length, 5); 
                 for(var i=0; i<maxItem; i++) {
-                    var r = data[i]; var st = String(r.status).toLowerCase();
+                    var r = dataHariIni[i]; var st = String(r.status).toLowerCase();
                     var color = 'text-brand-600 dark:text-brand-400'; var bg = 'bg-brand-50 dark:bg-brand-900/30'; var icon = 'fa-check';
                     if (st.indexOf('terlambat') > -1) { color = 'text-amber-500'; bg = 'bg-amber-50 dark:bg-amber-900/30'; icon = 'fa-clock'; }
                     else if (st.indexOf('izin') > -1) { color = 'text-orange-500'; bg = 'bg-orange-50 dark:bg-orange-900/30'; icon = 'fa-envelope-open-text'; }
@@ -1207,6 +1254,16 @@
         }
 
         function jalankanCetakPDF(mode) {
+            var cacheSetup = null;
+            try { cacheSetup = JSON.parse(localStorage.getItem('smartis_walikelas_paten')); } catch(e) {}
+
+            var waliData = {};
+            if (Object.keys(State.waliKelasData || {}).length > 0) {
+                waliData = State.waliKelasData;
+            } else if (cacheSetup) {
+                waliData = cacheSetup;
+            }
+
             document.body.setAttribute('data-print-mode', mode);
             
             var kelas = document.getElementById('filter-kelas').value || 'Semua';
@@ -1227,8 +1284,9 @@
                 var kelasIndv = document.getElementById('ind-kelas').innerText;
                 kelas = namaSiswaRaw.replace(/\s+/g, '_');
                 
-                var wkInd = State.waliKelasData[kelasIndv] || 'Nama Wali Kelas, S.Pd.';
+                var wkInd = (waliData[kelasIndv] && String(waliData[kelasIndv]).trim() !== '') ? String(waliData[kelasIndv]).trim() : '[NAMA WALI KELAS]';
                 document.getElementById('lbl-ttd-nama').innerText = wkInd;
+                
             } else {
                 pageStyle.innerHTML = '@media print { @page { size: A4 landscape !important; margin: 10mm; } body[data-print-mode="tahunan"] #wrap-rekap-tahunan { zoom: 0.85; } }';
                 if (mode === 'bulanan') {
@@ -1236,7 +1294,13 @@
                     var arrBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
                     namaBulan = '_' + arrBulan[parseInt(valBulan) - 1];
                 }
-                var wkBiasa = (kelas === 'Semua') ? '....................................' : (State.waliKelasData[kelas] || 'Nama Wali Kelas, S.Pd.');
+                
+                var wkBiasa = '[NAMA WALI KELAS]';
+                if (kelas === 'Semua') {
+                    wkBiasa = '....................................';
+                } else if (waliData[kelas] && String(waliData[kelas]).trim() !== '') {
+                    wkBiasa = String(waliData[kelas]).trim();
+                }
                 document.getElementById('lbl-ttd-nama').innerText = wkBiasa;
             }
             
@@ -1248,9 +1312,7 @@
             var modeTxt = mode === 'bulanan' ? "Bulanan" + namaBulan : (mode === 'tahunan' ? "Tahunan" : "Individu");
             var namaBaru = "Rekap_" + modeTxt + "_" + tahun + "_" + kelas + "_" + strWaktu;
             
-            var inpKota = document.getElementById('setup-kota');
-            var kotaCetak = (inpKota && inpKota.value) ? inpKota.value : State.kota;
-            document.getElementById('lbl-ttd-tempat-tgl').innerText = kotaCetak + ", " + formatTanggalIndo(d);
+            document.getElementById('lbl-ttd-tempat-tgl').innerText = "Bondowoso, " + formatTanggalIndo(d);
 
             document.title = namaBaru;
             try { judulParentAsli = window.parent.document.title; window.parent.document.title = namaBaru; } catch(e) {}
@@ -1263,7 +1325,7 @@
                     try { window.parent.document.title = judulParentAsli; } catch(e) {}
                     try { window.top.document.title = judulParentAsli; } catch(e) {}
                 }, 2000);
-            }, 800);
+            }, 500); 
         }
 
         function submitRekapIndividu() {
@@ -1319,34 +1381,73 @@
                                  '</tr>';
                     tbodyTahun.innerHTML = htmlTahun;
 
-                    var tbodyLog = document.getElementById('tbody-individu-log');
-                    if(!res.logDetail || res.logDetail.length === 0) {
-                        tbodyLog.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-400 italic border border-gray-200 dark:border-gray-600">Siswa tidak memiliki catatan indisipliner tahun ini.</td></tr>';
-                    } else {
-                        var htmlLog = '';
-                        for(var i=0; i<res.logDetail.length; i++) {
-                            var log = res.logDetail[i];
-                            var c = 'text-gray-600';
-                            if(log.status.toLowerCase().indexOf('lambat') > -1) c = 'text-amber-600 font-bold';
-                            else if(log.status.toLowerCase().indexOf('izin') > -1) c = 'text-orange-600 font-bold';
-                            else if(log.status.toLowerCase().indexOf('sakit') > -1) c = 'text-brand-600 font-bold';
-                            else if(log.status.toLowerCase().indexOf('alpa') > -1) c = 'text-rose-600 font-bold';
-
-                            htmlLog += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">' +
-                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600">' + (i+1) + '</td>' +
-                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 whitespace-nowrap">' + log.tanggal + '</td>' +
-                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 ' + c + '">' + log.status + '</td>' +
-                                        '<td class="p-2 border border-gray-200 dark:border-gray-600 text-xs">' + log.ket + '</td>' +
-                                       '</tr>';
-                        }
-                        tbodyLog.innerHTML = htmlLog;
-                    }
+                    State.dataLogIndividu = res.logDetail || [];
+                    State.currentPageLogIndividu = 1;
+                    renderTabelLogIndividu();
                 }
             }, function(err) {
                 btn.innerHTML = 'Tampilkan'; btn.disabled = false;
                 Swal.fire('Error', String(err), 'error');
             });
         }
+
+        function renderTabelLogIndividu() {
+            var tbodyLog = document.getElementById('tbody-individu-log');
+            var paginationInfo = document.getElementById('pagination-log-individu');
+            var btnPrev = document.getElementById('btn-prev-log');
+            var btnNext = document.getElementById('btn-next-log');
+            var infoPage = document.getElementById('info-page-log');
+            var wrapTable = document.getElementById('wrap-table-log');
+
+            if (!State.dataLogIndividu || State.dataLogIndividu.length === 0) {
+                tbodyLog.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-400 italic border border-gray-200 dark:border-gray-600">Siswa tidak memiliki catatan indisipliner tahun ini.</td></tr>';
+                if(paginationInfo) paginationInfo.classList.add('hidden');
+                if(wrapTable) { wrapTable.classList.add('rounded-xl'); wrapTable.classList.remove('rounded-t-xl', 'border-b-0'); }
+                return;
+            }
+
+            var totalPages = Math.ceil(State.dataLogIndividu.length / State.itemsPerPageLogIndividu);
+            if (totalPages <= 1) {
+                if(paginationInfo) paginationInfo.classList.add('hidden');
+                if(wrapTable) { wrapTable.classList.add('rounded-xl'); wrapTable.classList.remove('rounded-t-xl', 'border-b-0'); }
+            } else {
+                if(paginationInfo) paginationInfo.classList.remove('hidden');
+                if(wrapTable) { wrapTable.classList.remove('rounded-xl'); wrapTable.classList.add('rounded-t-xl', 'border-b-0'); }
+            }
+
+            if (State.currentPageLogIndividu > totalPages) State.currentPageLogIndividu = totalPages;
+            if (State.currentPageLogIndividu < 1) State.currentPageLogIndividu = 1;
+
+            var startIdx = (State.currentPageLogIndividu - 1) * State.itemsPerPageLogIndividu;
+            var endIdx = startIdx + State.itemsPerPageLogIndividu;
+            var currentData = State.dataLogIndividu.slice(startIdx, endIdx);
+
+            var htmlLog = '';
+            for(var i=0; i<currentData.length; i++) {
+                var log = currentData[i];
+                var originalIdx = startIdx + i + 1;
+                var c = 'text-gray-600';
+                if(log.status.toLowerCase().indexOf('lambat') > -1) c = 'text-amber-600 font-bold';
+                else if(log.status.toLowerCase().indexOf('izin') > -1) c = 'text-orange-600 font-bold';
+                else if(log.status.toLowerCase().indexOf('sakit') > -1) c = 'text-brand-600 font-bold';
+                else if(log.status.toLowerCase().indexOf('alpa') > -1) c = 'text-rose-600 font-bold';
+
+                htmlLog += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">' +
+                            '<td class="p-2 text-center border border-gray-200 dark:border-gray-600">' + originalIdx + '</td>' +
+                            '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 whitespace-nowrap">' + log.tanggal + '</td>' +
+                            '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 ' + c + '">' + log.status + '</td>' +
+                            '<td class="p-2 border border-gray-200 dark:border-gray-600 text-xs">' + log.ket + '</td>' +
+                           '</tr>';
+            }
+            tbodyLog.innerHTML = htmlLog;
+
+            if(infoPage) infoPage.innerText = 'Hal ' + State.currentPageLogIndividu + ' dari ' + totalPages;
+            if(btnPrev) btnPrev.disabled = State.currentPageLogIndividu === 1;
+            if(btnNext) btnNext.disabled = State.currentPageLogIndividu === totalPages;
+        }
+
+        function prevLogIndividu() { if (State.currentPageLogIndividu > 1) { State.currentPageLogIndividu--; renderTabelLogIndividu(); } }
+        function nextLogIndividu() { var totalPages = Math.ceil(State.dataLogIndividu.length / State.itemsPerPageLogIndividu); if (State.currentPageLogIndividu < totalPages) { State.currentPageLogIndividu++; renderTabelLogIndividu(); } }
 
         function submitRekap() {
             var bulan = parseInt(document.getElementById('filter-bulan').value);
@@ -1504,35 +1605,81 @@
             var inputTemplate = document.getElementById('setup-wa-template');
             var inputBatasMulai = document.getElementById('setup-batas-mulai');
             var inputBatas = document.getElementById('setup-batas-waktu');
-            var inputKota = document.getElementById('setup-kota');
+            var inputBatasAkhir = document.getElementById('setup-batas-akhir');
             
             var dispBatasMulai = document.getElementById('display-batas-mulai');
             var dispBatas = document.getElementById('display-batas-waktu');
+            var dispBatasAkhir = document.getElementById('display-batas-akhir');
+
+            try {
+                var paten = JSON.parse(localStorage.getItem('smartis_walikelas_paten'));
+                if (paten && typeof paten === 'object') {
+                    State.waliKelasData = paten;
+                }
+            } catch(e) {}
+
+            try {
+                var cacheSetup = JSON.parse(localStorage.getItem('smartis_cache_setup'));
+                if (cacheSetup) {
+                    if (inputToken && !inputToken.value) inputToken.value = cacheSetup.token || '';
+                    if (inputTemplate && !inputTemplate.value) inputTemplate.value = cacheSetup.template || '';
+                    if (inputBatasMulai && !inputBatasMulai.value) inputBatasMulai.value = cacheSetup.batasMulai || '06:00';
+                    if (inputBatas && !inputBatas.value) inputBatas.value = cacheSetup.batasWaktu || '07:00';
+                    if (inputBatasAkhir && !inputBatasAkhir.value) inputBatasAkhir.value = cacheSetup.batasAkhir || '08:00';
+                    if (dispBatasMulai && dispBatasMulai.innerText === '--:--') dispBatasMulai.innerText = cacheSetup.batasMulai || '06:00';
+                    if (dispBatas && dispBatas.innerText === '--:--') dispBatas.innerText = cacheSetup.batasWaktu || '07:00';
+                    if (dispBatasAkhir && dispBatasAkhir.innerText === '--:--') dispBatasAkhir.innerText = cacheSetup.batasAkhir || '08:00';
+                }
+            } catch(e) {}
+
+            var klsPil = document.getElementById('setup-kelas-wali');
+            var inpWal = document.getElementById('setup-wali');
+            if (klsPil && klsPil.value && inpWal) {
+                inpWal.value = State.waliKelasData[klsPil.value] || '';
+            }
 
             if (State.setupLoaded && !forceRefresh) return;
 
             Server.panggil('getPengaturan', [], function(res) {
                 if (res) {
                     State.setupLoaded = true;
-                    State.kota = res.kota || 'Surabaya';
-                    State.waliKelasData = res.waliKelasData || {};
                     
-                    if(inputToken) inputToken.value = res.token || '';
-                    if(inputTemplate) inputTemplate.value = res.template || 'Pemberitahuan: Ananda [NAMA] telah tercatat kehadirannya pada [WAKTU] dengan status: [STATUS].';
-                    if(inputKota) inputKota.value = State.kota;
+                    if (res.waliKelasData && typeof res.waliKelasData === 'object' && !Array.isArray(res.waliKelasData)) {
+                        for (var k in res.waliKelasData) {
+                            if (!State.waliKelasData[k]) State.waliKelasData[k] = res.waliKelasData[k];
+                        }
+                        localStorage.setItem('smartis_walikelas_paten', JSON.stringify(State.waliKelasData));
+                    }
+                    
+                    if(inputToken) inputToken.value = res.token || inputToken.value;
+                    if(inputTemplate) inputTemplate.value = res.template || inputTemplate.value;
 
-                    var bm = res.batasMulai || '06:00';
-                    var bw = res.batasWaktu || '07:00';
+                    var bm = res.batasMulai || (inputBatasMulai ? inputBatasMulai.value : '06:00');
+                    var bw = res.batasWaktu || (inputBatas ? inputBatas.value : '07:00');
+                    var ba = res.batasAkhir || (inputBatasAkhir ? inputBatasAkhir.value : '08:00');
+                    
                     if(inputBatasMulai) inputBatasMulai.value = bm;
                     if(inputBatas) inputBatas.value = bw;
+                    if(inputBatasAkhir) inputBatasAkhir.value = ba;
                     
                     if(dispBatasMulai) dispBatasMulai.innerText = bm;
                     if(dispBatas) dispBatas.innerText = bw;
+                    if(dispBatasAkhir) dispBatasAkhir.innerText = ba;
                     
-                    var kelasPilihan = document.getElementById('setup-kelas-wali');
-                    if (kelasPilihan && kelasPilihan.value) {
-                        document.getElementById('setup-wali').value = State.waliKelasData[kelasPilihan.value] || '';
+                    if (klsPil && klsPil.value && inpWal) {
+                        inpWal.value = State.waliKelasData[klsPil.value] || '';
+                        inpWal.disabled = false;
+                        inpWal.classList.remove('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-300');
+                        inpWal.classList.add('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
                     }
+
+                    localStorage.setItem('smartis_cache_setup', JSON.stringify({
+                        token: inputToken ? inputToken.value : '',
+                        template: inputTemplate ? inputTemplate.value : '',
+                        batasMulai: bm,
+                        batasWaktu: bw,
+                        batasAkhir: ba
+                    }));
                 }
             });
         }
@@ -1542,22 +1689,44 @@
             var template = document.getElementById('setup-wa-template').value;
             var batasMulai = document.getElementById('setup-batas-mulai').value || '06:00';
             var batas = document.getElementById('setup-batas-waktu').value || '07:00';
-            var kota = document.getElementById('setup-kota').value || 'Surabaya';
+            var batasAkhir = document.getElementById('setup-batas-akhir').value || '08:00';
             
+            var currentKelas = document.getElementById('setup-kelas-wali').value;
+            var currentWali = document.getElementById('setup-wali').value;
+            if (currentKelas && currentKelas !== "") {
+                if (!State.waliKelasData) State.waliKelasData = {};
+                State.waliKelasData[currentKelas] = currentWali;
+            }
+            
+            var payload = {
+                token: token, 
+                template: template, 
+                batasMulai: batasMulai, 
+                batasWaktu: batas, 
+                batasAkhir: batasAkhir,
+                kota: 'Bondowoso', 
+                waliKelasData: State.waliKelasData
+            };
+
+            localStorage.setItem('smartis_walikelas_paten', JSON.stringify(State.waliKelasData));
+            localStorage.setItem('smartis_cache_setup', JSON.stringify(payload));
+
             Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
-            Server.panggil('simpanPengaturan', [{token: token, template: template, batasMulai: batasMulai, batasWaktu: batas, kota: kota, waliKelasData: State.waliKelasData}], function(res) {
+            Server.panggil('simpanPengaturan', [payload], function(res) {
                 if(res && res.status === 'success') {
                     Swal.fire('Berhasil', res.message, 'success');
                     var dispBatasMulai = document.getElementById('display-batas-mulai');
                     var dispBatas = document.getElementById('display-batas-waktu');
+                    var dispBatasAkhir = document.getElementById('display-batas-akhir');
                     if(dispBatasMulai) dispBatasMulai.innerText = batasMulai;
                     if(dispBatas) dispBatas.innerText = batas;
+                    if(dispBatasAkhir) dispBatasAkhir.innerText = batasAkhir;
                     
                     muatPengaturanSistem(true); 
                 } else Swal.fire('Gagal', res ? res.message : 'Terjadi kesalahan', 'error');
             }, function(err) { Swal.fire('Error', String(err), 'error'); });
         }
-        
+
         function ubahSetupKelasWali(el) {
             var kls = el.value;
             var inp = document.getElementById('setup-wali');
@@ -1577,7 +1746,11 @@
         document.addEventListener('input', function(e) {
              if (e.target.id === 'setup-wali') {
                   var kls = document.getElementById('setup-kelas-wali').value;
-                  if(kls) State.waliKelasData[kls] = e.target.value;
+                  if(kls) {
+                      if (!State.waliKelasData) State.waliKelasData = {};
+                      State.waliKelasData[kls] = e.target.value;
+                      localStorage.setItem('smartis_walikelas_paten', JSON.stringify(State.waliKelasData));
+                  }
              }
         });
 
@@ -1692,6 +1865,8 @@
             else if (aksi === 'hapusSiswaPribadi') hapusSiswaPribadi(elemen.getAttribute('data-nisn'), elemen.getAttribute('data-nama'));
             else if (aksi === 'prevSiswa') prevSiswa();
             else if (aksi === 'nextSiswa') nextSiswa();
+            else if (aksi === 'prevLogIndividu') prevLogIndividu();
+            else if (aksi === 'nextLogIndividu') nextLogIndividu();
         });
 
         document.addEventListener('change', function(e) {
