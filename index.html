@@ -1,39 +1,1755 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Abzensi SMP Abu Zairi</title>
-  <style>
-    /* Mereset margin dan padding agar iframe penuh di jendela browser */
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden; /* Mencegah munculnya scrollbar ganda di parent */
-      background-color: #f0f0f0;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SMARTIS - SMP Unggulan Abu Zairi</title>
+    
+    <script>
+        window.onerror = function(msg, url, line) { console.error("Error Baris " + line + ": " + msg); return false; };
+    </script>
 
-    iframe {
-      position: absolute; /* Menggunakan absolute lebih stabil daripada fixed untuk iframe full-screen */
-      top: 0;
-      left: 0;
-      bottom: 0;
-      right: 0;
-      width: 100%; /* Diubah dari 100vw menjadi 100% */
-      height: 100%; /* Diubah dari 100vh menjadi 100% */
-      border: none;
-      display: block;
-    }
-  </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'] }, colors: { brand: { 50: '#f0f9ff', 100: '#e0f2fe', 200: '#bae6fd', 300: '#7dd3fc', 400: '#38bdf8', 500: '#0ea5e9', 600: '#0284c7', 700: '#0369a1', 800: '#075985', 900: '#0c4a6e' }, dark: { bg: '#0f172a', card: '#1e293b', border: '#334155' } } } }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; transition: background-color 0.4s ease; }
+        .bg-animated { background: linear-gradient(-45deg, #f8fafc, #f1f5f9, #e0f2fe, #ffffff); background-size: 400% 400%; animation: gradientBG 20s ease infinite; }
+        .dark body { background: #0f172a; animation: none; }
+        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+        .view-section { display: none; opacity: 0; } .view-section.active { display: block; opacity: 1; animation: fadeInUp 0.5s forwards; }
+        .tab-content { display: none; } .tab-content.active { display: block; animation: fadeInUp 0.5s forwards; }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
+        .dark .glass-card { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(51, 65, 85, 0.5); color: #f1f5f9; }
+        .smooth-hover { transition: all 0.3s; } .smooth-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        #reader { border: none !important; border-radius: 1rem; overflow: hidden; background: transparent; } #reader video { object-fit: cover; border-radius: 1rem; }
+        .scanner-frame { padding: 3px; background: linear-gradient(135deg, #0ea5e9, #0284c7); border-radius: 1.25rem; }
+        .scanner-inner { background: #ffffff; border-radius: 1rem; overflow: hidden; position: relative; } .dark .scanner-inner { background: #1e293b; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } .dark ::-webkit-scrollbar-thumb { background: #475569; }
+        .print-only-signature { display: none !important; }
+
+        @media print {
+            body { background: white !important; color: black !important; margin: 0; padding: 0; animation: none; font-family: Arial, sans-serif !important; }
+            .dark body { background: white !important; color: black !important; }
+            body[data-print-mode="bulanan"] #wrap-rekap-tahunan, body[data-print-mode="bulanan"] #wrap-rekap-individu { display: none !important; }
+            body[data-print-mode="tahunan"] #wrap-rekap-bulanan, body[data-print-mode="tahunan"] #wrap-rekap-individu { display: none !important; }
+            body[data-print-mode="individu"] #wrap-rekap-bulanan, body[data-print-mode="individu"] #wrap-rekap-tahunan { display: none !important; }
+            body > *:not(main) { display: none !important; }
+            main { display: block !important; width: 100% !important; max-width: none !important; padding: 0 !important; margin: 0 !important; }
+            section:not(#view-admin), #view-admin > div:first-child, .md\:hidden, #tab-dashboard, #tab-siswa, #tab-setup { display: none !important; }
+            #tab-rekap { display: block !important; width: 100% !important; }
+            .glass-card { background: transparent !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; color: black !important; }
+            .print\:hidden { display: none !important; }
+            .page-break-before { page-break-before: always !important; }
+            .overflow-x-auto { overflow: visible !important; border: none !important; margin: 0 !important; width: 100% !important; padding: 1px !important; }
+            
+            .print-header { display: block !important; margin-bottom: 15px; text-align: center; }
+            .print-header h2 { font-size: 16pt; margin: 0; font-weight: bold; text-transform: uppercase; }
+            .print-header h3 { font-size: 14pt; margin: 0; font-weight: bold; }
+            .print-header p { font-size: 11pt; margin: 4px 0 0 0; font-weight: 600; }
+            
+            table { width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; color: black !important; margin: 0 auto 0 auto !important; border: none !important; page-break-after: avoid !important; }
+            tr, td, th { page-break-inside: avoid !important; break-inside: avoid !important; }
+            th, td { border: 0.5pt solid #000 !important; color: #000 !important; text-align: center; vertical-align: middle; box-sizing: border-box !important; width: auto !important; }
+            th { border: 1.5pt solid #000 !important; background-color: #f3f4f6 !important; font-weight: bold; text-align: center !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            
+            #thead-rekap-bulanan th, #tbody-rekap-bulanan td { font-size: 9px !important; padding: 3px 1px !important; }
+            #thead-rekap-bulanan tr:first-child th:first-child { width: 25px !important; } 
+            #thead-rekap-bulanan tr:first-child th:nth-child(2) { width: 140px !important; } 
+            #tbody-rekap-bulanan td:nth-child(2), #tbody-rekap-tahunan td:nth-child(2) { text-align: left !important; padding-left: 4px !important; white-space: normal !important; word-wrap: break-word !important; }
+
+            #thead-rekap-tahunan th, #tbody-rekap-tahunan td { font-size: 9.5px !important; padding: 4px 1px !important; }
+            #thead-rekap-tahunan tr:first-child th:first-child { width: 25px !important; }
+            #thead-rekap-tahunan tr:first-child th:nth-child(2) { width: 150px !important; } 
+            
+            body[data-print-mode="individu"] #wrap-rekap-individu .grid { display: flex !important; flex-direction: column !important; gap: 10px !important; }
+            #thead-individu-tahunan th, #tbody-individu-tahunan td, #thead-individu-log th, #tbody-individu-log td { font-size: 11px !important; padding: 6px 4px !important; }
+            #print-profile-img { width: 70px !important; height: 70px !important; border: 2px solid #000 !important; border-radius: 8px !important; }
+            
+            .print-only-signature { display: flex !important; justify-content: flex-end; width: 100%; margin-top: 15px; page-break-inside: avoid !important; break-inside: avoid !important; page-break-before: avoid !important; break-before: avoid !important; }
+            .print-signature-box { width: 220px; text-align: center; color: black; }
+            .print-signature-box p { margin: 0; padding: 0; line-height: 1.5; }
+            #lbl-ttd-tempat-tgl { margin-bottom: 50px !important; font-size: 10pt; font-weight: 600; }
+            #lbl-ttd-nama { font-size: 10pt; text-decoration: underline; font-weight: bold; }
+
+            .bg-red-100 { background-color: #fee2e2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-red-50 { background-color: #fef2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-blue-50 { background-color: #eff6ff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .bg-green-50 { background-color: #f0fdf4 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            th.sticky, td.sticky { position: static !important; box-shadow: none !important; }
+            @page { size: A4 landscape; margin: 10mm; } 
+        }
+    </style>
 </head>
-<body>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col bg-animated dark:bg-dark-bg">
 
-  <iframe 
-    src="https://script.google.com/macros/s/AKfycbwvN3qMDqJ60OvauB4DkuKoZvSXMnkFxs-Q-410NRy2wdek4cCC_O_IQ50Eyae61FXJ2g/exec"
-    allowfullscreen="true">
-  </iframe>
+    <noscript><div style="background: red; color: white; padding: 20px; text-align: center; font-weight: bold; z-index: 9999; position: relative;">JAVASCRIPT DIBLOKIR. Harap aktifkan Javascript di browser Anda.</div></noscript>
 
+    <nav class="relative z-50 bg-gradient-to-r from-brand-900 to-brand-800 shadow-md text-white border-b border-brand-700 border-opacity-50 dark:from-gray-900 dark:to-gray-800 dark:border-gray-800">
+        <div class="max-w-6xl mx-auto px-4 py-3.5 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="bg-white p-1 rounded-full shadow-sm"><img src="https://i.ibb.co.com/x8dxgrF9/Logo-SMP-Unggulan-Abu-Zairi.png" alt="Logo SMP" class="h-9 w-9 object-contain"></div>
+                <div><h1 class="font-extrabold text-lg tracking-wide leading-tight">ABZENSI</h1><p class="text-[9px] text-brand-200 uppercase tracking-widest font-semibold dark:text-gray-400">SMP Unggulan Abu Zairi</p></div>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div id="mobile-admin-info" class="hidden text-right md:hidden border-r border-brand-700 pr-4 mr-1"><h2 class="text-xs font-bold leading-tight truncate max-w-[100px]" id="admin-name-mobile">Admin</h2><p class="text-[8px] text-brand-200 dark:text-gray-400 uppercase tracking-widest font-semibold">Panel Admin</p></div>
+                <button type="button" data-action="gantiTema" class="text-white hover:text-brand-200 smooth-hover bg-white/10 p-2 rounded-full w-9 h-9 flex items-center justify-center focus:outline-none"><i id="theme-icon" class="fa-solid fa-moon pointer-events-none"></i></button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="flex-grow w-full px-4 py-6 flex flex-col items-center">
+
+        <!-- ================= VIEW 1: ABSENSI ================= -->
+        <section id="view-absen" class="view-section active w-full max-w-md mx-auto">
+            <div class="glass-card rounded-2xl p-8 w-full text-center shadow-lg">
+                <img src="https://i.ibb.co.com/x8dxgrF9/Logo-SMP-Unggulan-Abu-Zairi.png" alt="Logo Sekolah" class="h-16 w-auto mx-auto mb-4 drop-shadow-md">
+                <h2 class="hidden sm:block text-3xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-800 to-brand-500 dark:from-brand-400 dark:to-brand-200 mb-1 tracking-tight">ABZENSI</h2>
+                
+                <div class="flex items-center justify-center space-x-2 mb-2">
+                    <i class="fa-solid fa-star text-amber-400 text-[10px]"></i><h3 class="text-sm font-bold text-brand-800 dark:text-gray-200 leading-tight tracking-wide">SMP Unggulan Abu Zairi</h3><i class="fa-solid fa-star text-amber-400 text-[10px]"></i>
+                </div>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mb-8 px-2 font-medium">Arahkan QR Code ke Kamera atau tap NFC.</p>
+                
+                <div class="scanner-frame mx-auto mb-8" style="max-width: 280px;">
+                    <div class="scanner-inner">
+                        <div id="reader" width="100%"></div>
+                        <div id="scanner-placeholder" class="py-16 flex flex-col items-center justify-center text-gray-300 dark:text-gray-600 bg-gray-50 dark:bg-gray-800/50"><i class="fa-solid fa-barcode text-6xl"></i></div>
+                    </div>
+                </div>
+
+                <div class="flex space-x-3 mb-4 w-full justify-center">
+                    <button type="button" data-action="bukaKamera" id="btn-start-scan" class="flex-1 bg-gradient-to-r from-brand-700 to-brand-500 text-white font-semibold py-3.5 px-2 rounded-xl shadow-lg smooth-hover relative z-20 text-xs sm:text-sm tracking-wide"><i class="fa-solid fa-camera mr-1 pointer-events-none"></i> Scan Barcode</button>
+                    <button type="button" data-action="bukaNFC" id="btn-start-nfc" class="flex-1 bg-gradient-to-r from-indigo-700 to-indigo-500 text-white font-semibold py-3.5 px-2 rounded-xl shadow-lg smooth-hover relative z-20 text-xs sm:text-sm tracking-wide"><i class="fa-solid fa-id-card-clip mr-1 pointer-events-none"></i> Tap NFC/RFID</button>
+                </div>
+
+                <div class="flex items-center my-6 opacity-70"><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div><span class="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Atau Manual</span><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div></div>
+
+                <div class="flex space-x-2 relative z-30">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3.5 pointer-events-none"><i class="fa-solid fa-id-card text-gray-400"></i></div>
+                        <input type="text" id="input-nisn" autocomplete="off" placeholder="Ketik Nama Siswa atau NISN..." class="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-600 text-black dark:text-white text-sm rounded-xl focus:ring-2 focus:ring-brand-500 block w-full pl-10 p-3.5 outline-none relative z-20 shadow-sm font-medium transition-all">
+                        <div id="dropdown-siswa" class="hidden absolute top-full left-0 right-0 mt-2 bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-xl shadow-xl max-h-60 overflow-y-auto z-50"><div class="p-4 text-center text-xs text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat...</div></div>
+                    </div>
+                    <button type="button" data-action="kirimManual" class="bg-gray-800 dark:bg-brand-600 text-white font-semibold py-3.5 px-5 rounded-xl smooth-hover shadow-md relative z-20"><i class="fa-solid fa-paper-plane pointer-events-none"></i></button>
+                </div>
+
+                <div class="mt-8 text-left bg-white/40 dark:bg-gray-800/40 p-4 rounded-xl border border-white/60 dark:border-gray-700 shadow-inner">
+                    <h3 class="text-[10px] font-bold text-gray-600 dark:text-gray-300 mb-3 flex items-center uppercase tracking-widest"><i class="fa-solid fa-user-xmark mr-2 text-rose-500 text-sm"></i> Tidak Hadir Hari Ini</h3>
+                    <ul id="list-tidak-masuk" class="max-h-40 overflow-y-auto divide-y divide-gray-200/50 dark:divide-gray-700 text-sm scrollbar-hide -mx-2 px-2">
+                        <li class="p-3 text-center text-gray-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</li>
+                    </ul>
+                </div>
+
+                <div class="mt-6 pt-5 border-t border-gray-200 dark:border-gray-700">
+                    <button type="button" data-action="keHalaman" data-target="view-login" class="w-full bg-transparent hover:bg-brand-50 dark:hover:bg-gray-800 text-brand-700 dark:text-brand-400 font-semibold py-3 px-4 rounded-xl border border-brand-200 dark:border-gray-600 smooth-hover relative z-20 text-sm transition-colors"><i class="fa-solid fa-lock mr-2 pointer-events-none"></i> Akses Admin</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 2: LOGIN ADMIN ================= -->
+        <section id="view-login" class="view-section w-full max-w-md mx-auto">
+            <div class="glass-card rounded-2xl p-8 w-full mt-4 shadow-lg">
+                <div class="text-center mb-8">
+                    <div class="w-20 h-20 bg-gradient-to-tr from-brand-100 to-white dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-700 dark:text-brand-400 shadow-sm border border-brand-50 dark:border-gray-600"><i class="fa-solid fa-user-shield text-3xl"></i></div>
+                    <h2 class="text-2xl font-bold text-gray-800 dark:text-white">Akses Admin</h2>
+                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1 font-medium">Sistem Rekapitulasi & Manajemen</p>
+                </div>
+                
+                <div class="mb-6 relative z-20">
+                    <label class="block mb-2 text-xs font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wide">Nomor Induk Yayasan (NIY)</label>
+                    <input type="password" id="input-niy" class="bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-600 text-black dark:text-white text-lg font-bold rounded-xl focus:ring-2 focus:ring-brand-500 block w-full p-3.5 outline-none text-center relative z-20 transition-all shadow-inner" placeholder="••••••">
+                </div>
+                
+                <button type="button" data-action="prosesLogin" id="btn-login" class="w-full text-white bg-gradient-to-r from-brand-800 to-brand-700 font-bold rounded-xl text-sm px-5 py-4 text-center shadow-lg smooth-hover relative z-20 tracking-wide">Masuk Dashboard</button>
+                <button type="button" data-action="keHalaman" data-target="view-absen" class="w-full mt-6 text-gray-400 hover:text-brand-700 text-xs font-semibold flex justify-center items-center smooth-hover relative z-20 uppercase tracking-wide"><i class="fa-solid fa-arrow-left mr-2 pointer-events-none"></i> Kembali</button>
+            </div>
+        </section>
+
+        <!-- ================= VIEW 3: ADMIN DASHBOARD ================= -->
+        <section id="view-admin" class="view-section w-full max-w-6xl mx-auto pb-24 md:pb-0">
+            <div class="hidden md:flex glass-card rounded-2xl p-4 w-full mb-6 mt-2 justify-between items-center relative z-10 print:hidden shadow-sm">
+                <div class="flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-full bg-brand-100 dark:bg-gray-700 flex items-center justify-center text-brand-700 dark:text-brand-400 font-bold text-xl shadow-sm"><i class="fa-solid fa-user-tie"></i></div>
+                    <div><h2 class="text-base font-bold text-gray-800 dark:text-white leading-tight" id="admin-name">Halo, Admin</h2><p class="text-[10px] text-brand-600 dark:text-gray-400 font-semibold uppercase tracking-widest">Pusat Manajemen</p></div>
+                </div>
+                <div class="flex bg-gray-50 dark:bg-gray-800/80 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-inner">
+                    <button type="button" data-action="keTab" data-target="tab-dashboard" class="tab-btn active px-4 py-2.5 text-xs font-semibold rounded-lg text-gray-500 data-[active=true]:bg-white data-[active=true]:text-brand-700 dark:data-[active=true]:bg-gray-700 dark:data-[active=true]:text-white smooth-hover transition-colors" data-active="true"><i class="fa-solid fa-chart-pie mr-2 pointer-events-none"></i>Dashboard</button>
+                    <button type="button" data-action="keTab" data-target="tab-siswa" class="tab-btn px-4 py-2.5 text-xs font-semibold rounded-lg text-gray-500 data-[active=true]:bg-white data-[active=true]:text-brand-700 dark:data-[active=true]:bg-gray-700 dark:data-[active=true]:text-white smooth-hover transition-colors"><i class="fa-solid fa-users mr-2 pointer-events-none"></i>Siswa</button>
+                    <button type="button" data-action="keTab" data-target="tab-rekap" class="tab-btn px-4 py-2.5 text-xs font-semibold rounded-lg text-gray-500 data-[active=true]:bg-white data-[active=true]:text-brand-700 dark:data-[active=true]:bg-gray-700 dark:data-[active=true]:text-white smooth-hover transition-colors"><i class="fa-solid fa-clipboard-list mr-2 pointer-events-none"></i>Rekap Absen</button>
+                    <button type="button" data-action="keTab" data-target="tab-setup" class="tab-btn px-4 py-2.5 text-xs font-semibold rounded-lg text-gray-500 data-[active=true]:bg-white data-[active=true]:text-brand-700 dark:data-[active=true]:bg-gray-700 dark:data-[active=true]:text-white smooth-hover transition-colors"><i class="fa-solid fa-gear mr-2 pointer-events-none"></i>Setup</button>
+                    <button type="button" data-action="keluarAdmin" class="px-4 py-2.5 text-xs font-bold rounded-lg text-rose-500 smooth-hover"><i class="fa-solid fa-power-off pointer-events-none"></i></button>
+                </div>
+            </div>
+
+            <div class="md:hidden fixed bottom-0 left-0 w-full bg-white/90 backdrop-blur-lg dark:bg-gray-900/90 border-t border-gray-200 dark:border-gray-800 flex justify-around items-center pt-2 pb-5 px-2 shadow-[0_-10px_30px_rgba(0,0,0,0.05)] z-50 print:hidden">
+                <button type="button" data-action="keTab" data-target="tab-dashboard" class="tab-btn active flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover" data-active="true"><i class="fa-solid fa-chart-pie text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Dashboard</span></button>
+                <button type="button" data-action="keTab" data-target="tab-siswa" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-users text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Siswa</span></button>
+                <button type="button" data-action="keTab" data-target="tab-rekap" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-clipboard-list text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Rekap</span></button>
+                <button type="button" data-action="keTab" data-target="tab-setup" class="tab-btn flex flex-col items-center justify-center w-full py-2 text-gray-400 data-[active=true]:text-brand-600 dark:data-[active=true]:text-brand-400 smooth-hover"><i class="fa-solid fa-gear text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Setup</span></button>
+                <button type="button" data-action="keluarAdmin" class="flex flex-col items-center justify-center w-full py-2 text-rose-400 smooth-hover relative z-20"><i class="fa-solid fa-power-off text-xl mb-1 pointer-events-none"></i><span class="text-[9px] font-bold pointer-events-none">Keluar</span></button>
+            </div>
+
+            <!-- TAB 1: DASHBOARD -->
+            <div id="tab-dashboard" class="tab-content active w-full">
+                <div class="flex justify-between items-center mb-6 mt-2">
+                    <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i> Dashboard</h3>
+                    <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm relative z-30 smooth-hover">
+                        <i class="fa-solid fa-calendar-days text-brand-500 text-sm"></i>
+                        <select id="global-tahun-dashboard" data-action="ubahTahunDashboard" class="bg-transparent text-sm font-bold outline-none cursor-pointer text-gray-700 dark:text-gray-200 pr-2 appearance-none pl-1">
+                            <option>Memuat...</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down text-[9px] text-gray-400 pointer-events-none absolute right-3"></i>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 md:gap-5 mb-6">
+                    <div class="rounded-xl md:rounded-2xl p-3 md:p-6 text-white shadow-lg relative overflow-hidden bg-gradient-to-br from-blue-500 to-brand-700 smooth-hover flex flex-col justify-center min-h-[75px] md:min-h-[140px]">
+                        <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 md:-mt-4 md:-mr-4 md:w-24 md:h-24 bg-white opacity-10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="relative z-10 w-full">
+                            <div class="absolute right-0 top-0 w-6 h-6 md:w-12 md:h-12 rounded-md md:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-[10px] md:text-xl shadow-inner"><i class="fa-solid fa-check-double"></i></div>
+                            <h3 class="text-base sm:text-lg md:text-3xl font-black mb-0.5 md:mb-1 tracking-tight pr-7 md:pr-14 truncate" id="card-tepat-val">-</h3>
+                            <p class="text-[7.5px] sm:text-[9px] md:text-xs font-medium opacity-90 tracking-wide leading-tight truncate" id="card-tepat-pct">Tepat Waktu -%</p>
+                        </div>
+                        <div class="hidden md:flex mt-auto pt-4 justify-between items-end text-[10px] opacity-80 font-bold uppercase tracking-widest relative z-10"><div><i class="fa-solid fa-calendar mr-1"></i> Periode Tahun</div><div class="lbl-tahun-card">-</div></div>
+                    </div>
+                    <div class="rounded-xl md:rounded-2xl p-3 md:p-6 text-white shadow-lg relative overflow-hidden bg-gradient-to-br from-emerald-500 to-green-600 smooth-hover flex flex-col justify-center min-h-[75px] md:min-h-[140px]">
+                        <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 md:-mt-4 md:-mr-4 md:w-24 md:h-24 bg-white opacity-10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="relative z-10 w-full">
+                            <div class="absolute right-0 top-0 w-6 h-6 md:w-12 md:h-12 rounded-md md:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-[10px] md:text-xl shadow-inner"><i class="fa-solid fa-clock"></i></div>
+                            <h3 class="text-base sm:text-lg md:text-3xl font-black mb-0.5 md:mb-1 tracking-tight pr-7 md:pr-14 truncate" id="card-lambat-val">-</h3>
+                            <p class="text-[7.5px] sm:text-[9px] md:text-xs font-medium opacity-90 tracking-wide leading-tight truncate" id="card-lambat-pct">Terlambat -%</p>
+                        </div>
+                        <div class="hidden md:flex mt-auto pt-4 justify-between items-end text-[10px] opacity-80 font-bold uppercase tracking-widest relative z-10"><div><i class="fa-solid fa-calendar mr-1"></i> Periode Tahun</div><div class="lbl-tahun-card">-</div></div>
+                    </div>
+                    <div class="rounded-xl md:rounded-2xl p-3 md:p-6 text-white shadow-lg relative overflow-hidden bg-gradient-to-br from-rose-500 to-red-600 smooth-hover flex flex-col justify-center min-h-[75px] md:min-h-[140px]">
+                        <div class="absolute top-0 right-0 -mt-2 -mr-2 w-16 h-16 md:-mt-4 md:-mr-4 md:w-24 md:h-24 bg-white opacity-10 rounded-full blur-xl pointer-events-none"></div>
+                        <div class="relative z-10 w-full">
+                            <div class="absolute right-0 top-0 w-6 h-6 md:w-12 md:h-12 rounded-md md:rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center text-[10px] md:text-xl shadow-inner"><i class="fa-solid fa-user-xmark"></i></div>
+                            <h3 class="text-base sm:text-lg md:text-3xl font-black mb-0.5 md:mb-1 tracking-tight pr-7 md:pr-14 truncate" id="card-alpa-val">-</h3>
+                            <p class="text-[7.5px] sm:text-[9px] md:text-xs font-medium opacity-90 tracking-wide leading-tight truncate" id="card-alpa-pct">Alpa -%</p>
+                        </div>
+                        <div class="hidden md:flex mt-auto pt-4 justify-between items-end text-[10px] opacity-80 font-bold uppercase tracking-widest relative z-10"><div><i class="fa-solid fa-calendar mr-1"></i> Periode Tahun</div><div class="lbl-tahun-card">-</div></div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 mb-5 flex justify-between items-center bg-white dark:bg-gray-800 border-l-4 border-amber-400 shadow-sm smooth-hover">
+                    <div>
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-bolt text-amber-500 mr-2"></i>Aksi Cepat</h3>
+                        <p class="text-[10px] text-gray-500 dark:text-gray-400 mt-0.5">Input izin atau sakit siswa secara manual</p>
+                    </div>
+                    <button type="button" data-action="modalInputIzin" class="bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold py-2.5 px-5 rounded-xl shadow-md smooth-hover"><i class="fa-solid fa-notes-medical mr-1 pointer-events-none"></i> Input Manual</button>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div class="glass-card rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm"><p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold mb-1 uppercase tracking-wider">Total Siswa</p><h3 class="text-2xl font-black text-brand-700 dark:text-brand-400" id="stat-siswa">-</h3></div>
+                    <div class="glass-card rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm"><p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold mb-1 uppercase tracking-wider">Total Kelas</p><h3 class="text-2xl font-black text-amber-600 dark:text-amber-400" id="stat-kelas">-</h3></div>
+                    <div class="glass-card rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm"><p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold mb-1 uppercase tracking-wider">Siswa Putra</p><h3 class="text-2xl font-black text-sky-600 dark:text-sky-400" id="stat-putra">-</h3></div>
+                    <div class="glass-card rounded-2xl p-4 border border-gray-100 dark:border-gray-700 shadow-sm"><p class="text-[10px] text-gray-500 dark:text-gray-400 font-semibold mb-1 uppercase tracking-wider">Siswa Putri</p><h3 class="text-2xl font-black text-pink-600 dark:text-pink-400" id="stat-putri">-</h3></div>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                    <div class="glass-card rounded-2xl p-6 md:col-span-1 shadow-sm">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-4"><i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i>Komposisi Presensi</h3>
+                        <div class="h-48 w-full"><canvas id="chart-pie"></canvas></div>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 md:col-span-2 flex flex-col shadow-sm">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-white mb-4"><i class="fa-solid fa-chart-column mr-2 text-brand-500"></i>Tren Kehadiran Bulanan</h3>
+                        <div class="h-48 w-full flex-grow"><canvas id="chart-bar"></canvas></div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-sm font-bold text-gray-800 dark:text-white"><i class="fa-solid fa-clock-rotate-left mr-2 text-brand-500"></i>Log Terbaru Hari Ini</h3>
+                        <button type="button" data-action="keTab" data-target="tab-rekap" class="text-xs font-semibold text-brand-600 dark:text-brand-400 hover:text-brand-800 transition-colors smooth-hover px-3 py-1 bg-brand-50 dark:bg-gray-800 rounded-lg">Lihat Rekap Penuh</button>
+                    </div>
+                    <div class="bg-white/80 dark:bg-gray-800/80 rounded-xl border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <ul id="list-log-dashboard" class="divide-y divide-gray-100/80 dark:divide-gray-700/80 text-sm">
+                            <li class="p-5 text-center text-gray-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat log...</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: SISWA -->
+            <div id="tab-siswa" class="tab-content w-full">
+                <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
+                        <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-users mr-2 text-brand-500"></i>Data Master Siswa</h3>
+                        <div class="space-x-2 flex w-full sm:w-auto">
+                            <button type="button" data-action="tindakHapusMasal" id="btn-hapus-masal" class="hidden flex-1 sm:flex-none bg-rose-500 hover:bg-rose-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-sm smooth-hover"><i class="fa-solid fa-trash-can mr-1 pointer-events-none"></i>Hapus Terpilih</button>
+                            <button type="button" data-action="tambahSiswa" id="btn-tambah-siswa" class="flex-1 sm:flex-none bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md smooth-hover"><i class="fa-solid fa-plus mr-1 pointer-events-none"></i>Tambah Siswa</button>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700">
+                        <table class="w-full text-sm text-left text-gray-600 dark:text-gray-400">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-800 dark:text-gray-300">
+                                <tr>
+                                    <th class="w-12 px-4 py-4 text-center"><input type="checkbox" data-action="centangSemua" id="check-semua" class="w-4 h-4 rounded cursor-pointer accent-brand-600"></th>
+                                    <th class="px-4 py-4 text-center">Foto</th><th class="px-4 py-4">NISN</th><th class="px-4 py-4">Nama Lengkap</th><th class="px-4 py-4">Kelas</th><th class="px-4 py-4">No. WhatsApp</th><th class="px-4 py-4 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tabel-siswa" class="divide-y divide-gray-100 dark:divide-gray-700"><tr><td colspan="7" class="px-4 py-8 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat data...</td></tr></tbody>
+                        </table>
+                    </div>
+                    <div id="pagination-siswa" class="flex justify-between items-center px-5 py-4 border border-t-0 border-gray-200 dark:border-gray-700 rounded-b-xl bg-gray-50/50 dark:bg-gray-800/50 hidden">
+                        <button type="button" data-action="prevSiswa" id="btn-prev-siswa" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-xs font-semibold rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 smooth-hover disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"><i class="fa-solid fa-chevron-left mr-2 pointer-events-none"></i> Sebelumnya</button>
+                        <span id="info-page-siswa" class="text-xs font-semibold text-gray-500 dark:text-gray-400">Halaman 1 dari 1</span>
+                        <button type="button" data-action="nextSiswa" id="btn-next-siswa" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-xs font-semibold rounded-lg text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 smooth-hover disabled:opacity-50 disabled:cursor-not-allowed shadow-sm">Selanjutnya <i class="fa-solid fa-chevron-right ml-2 pointer-events-none"></i></button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 3: REKAP ABSEN -->
+            <div id="tab-rekap" class="tab-content w-full">
+                
+                <div class="flex space-x-2 mb-4 print:hidden bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl w-fit border border-gray-200 dark:border-gray-700">
+                    <button type="button" data-action="switchModeRekap" data-mode="kelas" id="btn-mode-kelas" class="px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-600 text-brand-700 dark:text-brand-300 shadow-sm transition-all pointer-events-none">Rekap Kelas</button>
+                    <button type="button" data-action="switchModeRekap" data-mode="individu" id="btn-mode-individu" class="px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all smooth-hover">Rekap Individu (Per Siswa)</button>
+                </div>
+
+                <div id="rekap-mode-kelas">
+                    <div id="rekap-highlight" class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5 print:hidden hidden">
+                        <div class="bg-gradient-to-br from-amber-50 to-amber-100 dark:from-amber-900/40 dark:to-amber-800/40 border border-amber-200 dark:border-amber-700/50 rounded-2xl p-5 flex items-center shadow-sm smooth-hover">
+                            <div class="w-14 h-14 rounded-full bg-amber-200/50 flex items-center justify-center text-2xl text-amber-600 mr-4"><i class="fa-solid fa-trophy"></i></div>
+                            <div><p class="text-[10px] text-amber-700 dark:text-amber-400 font-bold uppercase tracking-widest mb-0.5">Terajin Bulan Ini</p><h4 id="terajin-bulan" class="text-xl font-black text-gray-800 dark:text-white leading-tight">-</h4><p id="stat-terajin-bulan" class="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">-</p></div>
+                        </div>
+                        <div class="bg-gradient-to-br from-brand-50 to-brand-100 dark:from-brand-900/40 dark:to-brand-800/40 border border-brand-200 dark:border-brand-700/50 rounded-2xl p-5 flex items-center shadow-sm smooth-hover">
+                            <div class="w-14 h-14 rounded-full bg-brand-200/50 flex items-center justify-center text-2xl text-brand-600 mr-4"><i class="fa-solid fa-medal"></i></div>
+                            <div><p class="text-[10px] text-brand-700 dark:text-brand-400 font-bold uppercase tracking-widest mb-0.5">Terajin Tahun Ini</p><h4 id="terajin-tahun" class="text-xl font-black text-gray-800 dark:text-white leading-tight">-</h4><p id="stat-terajin-tahun" class="text-xs text-gray-600 dark:text-gray-300 mt-1 font-medium">-</p></div>
+                        </div>
+                    </div>
+
+                    <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
+                        <h3 class="text-xl font-extrabold text-gray-800 dark:text-white mb-5 print:hidden"><i class="fa-solid fa-calendar-days mr-2 text-brand-500"></i>Rekapitulasi Kelas</h3>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden shadow-sm">
+                            <div><label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">Pilih Kelas</label><select id="filter-kelas" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium"><option value="Semua">Semua Kelas</option></select></div>
+                            <div class="md:col-span-2">
+                                <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">Pilih Periode</label>
+                                <div class="flex space-x-3">
+                                    <select id="filter-bulan" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium">
+                                        <option value="1">Januari</option><option value="2">Februari</option><option value="3">Maret</option><option value="4">April</option><option value="5">Mei</option><option value="6">Juni</option><option value="7">Juli</option><option value="8">Agustus</option><option value="9">September</option><option value="10">Oktober</option><option value="11">November</option><option value="12">Desember</option>
+                                    </select>
+                                    <select id="filter-tahun" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium"></select>
+                                </div>
+                            </div>
+                            <div class="flex items-end space-x-3">
+                                <button type="button" data-action="submitRekap" id="btn-submit-rekap" class="bg-brand-600 hover:bg-brand-700 text-white text-sm font-bold py-2.5 px-3 rounded-lg smooth-hover shadow-md flex-[2]">Tampilkan</button>
+                                <div class="relative flex-1" id="wrap-btn-print">
+                                    <button type="button" data-action="togglePrint" class="bg-gray-800 dark:bg-gray-600 hover:bg-gray-900 dark:hover:bg-gray-500 text-white text-sm font-bold py-2.5 px-3 rounded-lg smooth-hover shadow-md w-full flex justify-center items-center gap-2"><i class="fa-solid fa-print pointer-events-none"></i> <i class="fa-solid fa-chevron-down text-[10px] pointer-events-none"></i></button>
+                                    <div id="dropdown-print" class="hidden absolute right-0 top-full mt-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl w-48 overflow-hidden z-50">
+                                        <div class="text-[10px] font-bold text-gray-400 bg-gray-50 dark:bg-gray-700/50 px-4 py-2 uppercase tracking-wider">Opsi Cetak PDF</div>
+                                        <button type="button" data-action="cetakPDF" data-mode="bulanan" class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-brand-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 transition-colors"><i class="fa-solid fa-table mr-2 text-brand-500 pointer-events-none"></i> Rekap Bulanan</button>
+                                        <button type="button" data-action="cetakPDF" data-mode="tahunan" class="w-full text-left px-4 py-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-brand-50 dark:hover:bg-gray-700 transition-colors"><i class="fa-solid fa-table-list mr-2 text-emerald-500 pointer-events-none"></i> Rekap Tahunan</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-blue-50/50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-4 print:hidden flex flex-wrap gap-3 items-center text-[11px] text-gray-600 dark:text-gray-400">
+                            <span class="font-bold text-gray-800 dark:text-gray-200 mr-2"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Petunjuk:</span>
+                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><span class="inline-block w-3 h-3 bg-red-100 border border-red-200 align-middle mr-1 rounded-sm"></span>= Libur (Jumat)</span>
+                        </div>
+
+                        <div id="wrap-rekap-bulanan">
+                            <div class="hidden print-header"><h2>Rekap Absen Bulanan</h2><h3>SMP Unggulan Abu Zairi</h3><p id="print-subtitle"></p></div>
+                            <h4 class="font-bold text-brand-800 dark:text-brand-400 mb-2 mt-4 print:hidden">Tabel Detail Bulanan</h4>
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 max-h-[500px] relative shadow-sm">
+                                <table class="w-full text-xs text-center border-collapse">
+                                    <thead id="thead-rekap-bulanan" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-600 sticky top-0 z-20"></thead>
+                                    <tbody id="tbody-rekap-bulanan" class="text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"><tr><td class="p-10"><i class="fa-solid fa-filter text-gray-300 text-3xl mb-3 block"></i>Silakan filter untuk memuat data.</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div id="wrap-rekap-tahunan">
+                            <div class="page-break-before print:hidden"></div>
+                            <div class="hidden print-header"><h2>Rekap Absen Tahunan</h2><h3>SMP Unggulan Abu Zairi</h3><p id="print-subtitle-tahunan"></p></div>
+                            <h4 class="font-bold text-emerald-700 dark:text-emerald-400 mb-2 mt-6 print:hidden">Tabel Total Tahunan (12 Bulan)</h4>
+                            <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 max-h-[400px] relative shadow-sm">
+                                <table class="w-full text-sm text-center border-collapse">
+                                    <thead id="thead-rekap-tahunan" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-600 sticky top-0 z-20"></thead>
+                                    <tbody id="tbody-rekap-tahunan" class="text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"><tr><td class="p-10"><i class="fa-solid fa-filter text-gray-300 text-3xl mb-3 block"></i>Silakan filter untuk memuat data.</td></tr></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="rekap-mode-individu" class="hidden">
+                    <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
+                        <h3 class="text-xl font-extrabold text-gray-800 dark:text-white mb-5 print:hidden"><i class="fa-solid fa-user-check mr-2 text-brand-500"></i>Rekapitulasi Individu</h3>
+                        
+                        <div class="flex flex-col sm:flex-row gap-4 mb-6 bg-white dark:bg-gray-800 p-5 rounded-xl border border-gray-200 dark:border-gray-700 print:hidden shadow-sm">
+                            <div class="w-full sm:w-1/3">
+                                <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">Pilih Kelas</label>
+                                <select id="filter-kelas-individu" data-action="ubahKelasIndividu" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium"><option value="">-- Pilih Kelas --</option></select>
+                            </div>
+                            <div class="flex-grow">
+                                <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">Pilih Nama Siswa</label>
+                                <select id="filter-siswa-individu" disabled class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium"><option value="">-- Pilih Kelas Dahulu --</option></select>
+                            </div>
+                            <div class="w-full sm:w-32">
+                                <label class="block text-[11px] font-bold text-gray-500 dark:text-gray-400 mb-1.5 uppercase tracking-wider">Tahun</label>
+                                <select id="filter-tahun-individu" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2.5 text-sm outline-none focus:border-brand-500 transition-colors font-medium"></select>
+                            </div>
+                            <div class="flex items-end space-x-2 w-full sm:w-auto">
+                                <button type="button" data-action="submitRekapIndividu" id="btn-submit-rekap-individu" class="w-full sm:w-auto bg-brand-600 hover:bg-brand-700 text-white text-sm font-bold py-2.5 px-4 rounded-lg smooth-hover shadow-md">Tampilkan</button>
+                                <button type="button" data-action="cetakPDF" data-mode="individu" id="btn-print-individu" class="hidden w-full sm:w-auto bg-gray-800 dark:bg-gray-600 hover:bg-gray-900 dark:hover:bg-gray-500 text-white text-sm font-bold py-2.5 px-4 rounded-lg smooth-hover shadow-md"><i class="fa-solid fa-print pointer-events-none"></i> Print A4</button>
+                            </div>
+                        </div>
+
+                        <div id="wrap-rekap-individu" class="hidden">
+                            <div class="hidden print-header"><h2>Buku Induk Absensi Siswa</h2><h3>SMP Unggulan Abu Zairi</h3><p id="print-subtitle-individu"></p></div>
+
+                            <div class="flex items-center p-4 bg-brand-50 dark:bg-gray-800 border border-brand-100 dark:border-gray-700 rounded-xl mb-6 shadow-sm">
+                                <img id="ind-foto" src="" alt="Foto" class="w-16 h-16 object-cover rounded-lg border border-gray-200 shadow-sm mr-4 bg-white" style="id='print-profile-img'">
+                                <div id="print-profile-info">
+                                    <h2 id="ind-nama" class="text-lg md:text-xl font-black text-gray-800 dark:text-white uppercase leading-tight">-</h2>
+                                    <div class="flex items-center space-x-3 mt-1 text-xs md:text-sm font-semibold text-gray-600 dark:text-gray-400">
+                                        <span><i class="fa-solid fa-id-card mr-1"></i> NISN: <span id="ind-nisn">-</span></span><span>|</span><span><i class="fa-solid fa-layer-group mr-1"></i> Kelas: <span id="ind-kelas">-</span></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <h4 class="font-bold text-brand-800 dark:text-brand-400 mb-2 border-b-2 border-brand-200 dark:border-brand-800 pb-1">Rekapitulasi 1 Tahun</h4>
+                                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                                        <table class="w-full text-xs text-center border-collapse">
+                                            <thead id="thead-individu-tahunan" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-600">
+                                                <tr><th class="p-2">Bulan</th><th class="p-2 bg-[#c6f6d5] text-[#22543d] dark:bg-emerald-900/40 dark:text-emerald-300">Hadir</th><th class="p-2 bg-[#fef08a] text-[#854d0e] dark:bg-amber-900/40 dark:text-amber-300">Lambat</th><th class="p-2 bg-[#fed7d7] text-[#822727] dark:bg-orange-900/40 dark:text-orange-300">Izin</th><th class="p-2 bg-[#bfdbfe] text-[#1e3a8a] dark:bg-brand-900/40 dark:text-brand-300">Sakit</th><th class="p-2 bg-[#fecdd3] text-[#be123c] dark:bg-rose-900/40 dark:text-rose-300">Alpa</th></tr>
+                                            </thead>
+                                            <tbody id="tbody-individu-tahunan" class="text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="print:hidden">
+                                    <h4 class="font-bold text-rose-700 dark:text-rose-400 mb-2 border-b-2 border-rose-200 dark:border-rose-800 pb-1">Log Indisipliner & Keterangan</h4>
+                                    <div class="overflow-x-auto rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm max-h-[360px] relative">
+                                        <table class="w-full text-xs text-left border-collapse">
+                                            <thead id="thead-individu-log" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 font-bold border-b border-gray-200 dark:border-gray-600 sticky top-0 z-10">
+                                                <tr><th class="p-2 w-10 text-center">No</th><th class="p-2 w-24 text-center">Tanggal</th><th class="p-2 w-24 text-center">Status</th><th class="p-2">Keterangan Opsional</th></tr>
+                                            </thead>
+                                            <tbody id="tbody-individu-log" class="text-gray-600 dark:text-gray-400 bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div id="print-signature" class="print-only-signature">
+                    <div class="print-signature-box"><p id="lbl-ttd-tempat-tgl"></p><p id="lbl-ttd-nama"></p><p class="text-[10pt] font-semibold mt-1">Wali Kelas</p></div>
+                </div>
+
+            </div>
+
+            <!-- TAB 4: SETUP -->
+            <div id="tab-setup" class="tab-content w-full">
+                <div class="glass-card rounded-2xl p-8 mb-4 max-w-3xl mx-auto shadow-lg">
+                    <div class="text-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
+                        <div class="w-16 h-16 rounded-full bg-brand-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4 text-brand-600 text-2xl shadow-inner border border-brand-100 dark:border-gray-700"><i class="fa-solid fa-gears"></i></div>
+                        <h3 class="text-2xl font-extrabold text-gray-800 dark:text-white mb-1">Pengaturan Sistem</h3>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Manajemen data, cetak PDF, dan konfigurasi notifikasi.</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-4 mb-8 text-left">
+                        <button type="button" data-action="tambahKelas" id="btn-tambah-kelas" class="flex items-center p-5 bg-gray-50 dark:bg-gray-800/80 border border-gray-200 dark:border-gray-700 rounded-2xl smooth-hover relative z-20 shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-brand-600 dark:text-brand-400 mr-4 shadow-sm pointer-events-none"><i class="fa-solid fa-layer-group text-lg pointer-events-none"></i></div>
+                            <div class="pointer-events-none"><h4 class="font-bold text-gray-800 dark:text-white text-sm pointer-events-none">Tambah Kelas Baru</h4><p class="text-[11px] text-gray-500 dark:text-gray-400 pointer-events-none mt-0.5">Kelola daftar rombongan belajar (rombel)</p></div>
+                            <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-6 text-left mb-6">
+                        
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-4 text-sm flex items-center"><i class="fa-solid fa-file-signature text-brand-500 mr-2.5 text-lg"></i> Informasi Lembar Cetak (PDF)</h4>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row gap-4 mb-4">
+                                    <div class="w-full sm:w-1/2">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Kota/Kabupaten</label>
+                                        <input type="text" id="setup-kota" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all" placeholder="Misal: Surabaya">
+                                    </div>
+                                </div>
+                                <div class="flex flex-col sm:flex-row gap-4 border-t border-gray-100 dark:border-gray-700 pt-4">
+                                    <div class="w-full sm:w-1/2">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Pilih Kelas</label>
+                                        <select id="setup-kelas-wali" data-action="ubahSetupKelasWali" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 transition-colors text-sm font-medium">
+                                            <option value="">-- Pilih Kelas --</option>
+                                        </select>
+                                    </div>
+                                    <div class="w-full sm:w-1/2">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Nama Wali Kelas (Gelar)</label>
+                                        <input type="text" id="setup-wali" disabled class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-300 rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all" placeholder="Pilih kelas dahulu...">
+                                    </div>
+                                </div>
+                                <p class="text-[10px] text-gray-500 dark:text-gray-400">Data wali kelas akan disesuaikan dengan rekap kelas yang dicetak ke PDF.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-4 text-sm flex items-center"><i class="fa-solid fa-clock text-brand-500 mr-2.5 text-lg"></i> Konfigurasi Waktu Presensi</h4>
+                            <div class="mb-5 p-3.5 bg-brand-50 dark:bg-brand-900/20 rounded-xl border border-brand-100 dark:border-brand-800/50 flex items-start">
+                                <i class="fa-solid fa-circle-info mt-0.5 mr-3 text-brand-500"></i> 
+                                <div class="text-xs text-brand-800 dark:text-brand-200 leading-relaxed">
+                                    <b>Status Aturan Aktif:</b> Presensi dibuka mulai <span id="display-batas-mulai" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span>. Melewati jam <span id="display-batas-waktu" class="font-bold border-b border-brand-300 dark:border-brand-600 pb-0.5">--:--</span> dianggap terlambat.
+                                </div>
+                            </div>
+                            <div class="space-y-4">
+                                <div class="flex flex-col sm:flex-row gap-4">
+                                    <div class="w-full sm:w-1/2">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Jam Mulai Buka Absen</label>
+                                        <input type="time" id="setup-batas-mulai" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all">
+                                    </div>
+                                    <div class="w-full sm:w-1/2">
+                                        <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Batas Tepat Waktu</label>
+                                        <input type="time" id="setup-batas-waktu" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm font-medium transition-all">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                            <h4 class="font-bold text-gray-800 dark:text-white mb-4 text-sm flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2.5 text-lg"></i> Integrasi API WhatsApp</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Token Fonnte</label>
+                                    <input type="text" id="setup-fonnte-token" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm font-mono transition-all" placeholder="Masukkan Token rahasia API Fonnte...">
+                                </div>
+                                <div>
+                                    <label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1.5 block">Template Pesan Otomatis</label>
+                                    <textarea id="setup-wa-template" rows="3" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 text-sm leading-relaxed transition-all" placeholder="Contoh: Ananda [NAMA] telah absen pada [WAKTU]..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="button" data-action="simpanPengaturanSistem" class="bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg smooth-hover w-full relative z-20 text-sm tracking-wide mt-2"><i class="fa-solid fa-floppy-disk mr-2 pointer-events-none"></i> Simpan Konfigurasi</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // ================= KUMPULAN FUNGSI UTILITAS & API =================
+        var State = {
+            kamera: null, kameraAktif: false, nfcController: null,
+            dataSiswa: [], dataSiswaAbsen: [], pChart: null, bChart: null,
+            currentPageSiswa: 1, itemsPerPageSiswa: 10,
+            siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false,
+            kota: 'Surabaya', waliKelasData: {}
+        };
+
+        function getNamaBulan(m) {
+            var b = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            return b[m - 1];
+        }
+
+        function formatTanggalIndo(dateObj) {
+            var b = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            return dateObj.getDate() + ' ' + b[dateObj.getMonth()] + ' ' + dateObj.getFullYear();
+        }
+
+        window.compressImage = function(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    var img = new Image();
+                    img.onload = function() {
+                        var canvas = document.createElement('canvas'); var ctx = canvas.getContext('2d');
+                        var MAX_WIDTH = 150; var MAX_HEIGHT = 150; var width = img.width; var height = img.height;
+                        if (width > height) { if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; } } 
+                        else { if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; } }
+                        canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
+                        var dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+                        var preview = document.getElementById('preview-foto'); if(preview) preview.src = dataUrl;
+                        var b64Input = document.getElementById('s-foto-b64'); if(b64Input) b64Input.value = dataUrl;
+                    }; img.src = e.target.result;
+                }; reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        // ========== URL GOOGLE APPS SCRIPT ANDA ==========
+        var GAS_URL = "https://script.google.com/macros/s/AKfycbwvN3qMDqJ60OvauB4DkuKoZvSXMnkFxs-Q-410NRy2wdek4cCC_O_IQ50Eyae61FXJ2g/exec";
+
+        var Server = {
+            panggil: function(namaFungsi, args, sukses, gagal) {
+                var jalankanSimulasi = function() {
+                    setTimeout(function() {
+                        if (namaFungsi === 'loginAdmin') {
+                            if (args && args[0] === '12345') sukses({status: 'success', nama: 'Admin Lokal'}); else sukses({status: 'error', message: 'Gunakan NIY 12345'});
+                        }
+                        else if (namaFungsi === 'catatAbsensi') sukses({status: 'success', message: 'Simulasi absen berhasil'});
+                        else if (namaFungsi === 'getRekapData') sukses([]);
+                        else if (namaFungsi === 'getDashboardData') {
+                            var tReq = (args && args[0]) ? args[0] : new Date().getFullYear();
+                            sukses({ totalSiswa: 320, totalKelas: 12, putra: 155, putri: 165, kehadiranBulanIni: [6800, 150, 90, 120], availableYears: [tReq-1, tReq, tReq+1], trenBulanan: { hadir: [224, 202, 203, 213, 223, 193, 224, 213, 200, 223, 201, 212], terlambat: [3, 10, 5, 8, 4, 12, 5, 6, 8, 10, 5, 6], izinSakit: [5, 4, 8, 3, 5, 6, 4, 5, 2, 4, 3, 5], alpa: [0, 2, 1, 1, 1, 1, 1, 0, 0, 2, 3, 2] } });
+                        }
+                        else if (namaFungsi === 'getDataSiswa') {
+                            var dummySiswa = [];
+                            for(var i=1; i<=25; i++) dummySiswa.push({nisn: '100'+i, nama: 'Siswa Contoh ' + i, kelas: (i%2===0?'VII-A':'VIII-A'), wa: '081', foto: '', rfid: 'A1B2C3D' + i});
+                            sukses(dummySiswa);
+                        }
+                        else if (namaFungsi === 'getDaftarKelas') sukses(['VII-A', 'VIII-A']);
+                        else if (namaFungsi === 'inputIzinSiswa') sukses({status: 'success', message: 'Simulasi input sukses'});
+                        else if (namaFungsi === 'getPengaturan') {
+                            sukses({token: 'DUMMY', template: 'Ananda [NAMA] telah hadir pada [WAKTU]', batasMulai: '06:00', batasWaktu: '07:00', kota: 'Pamekasan', waliKelasData: {}});
+                        }
+                        else if (namaFungsi === 'simpanPengaturan') sukses({status: 'success', message: 'Simulasi simpan Pengaturan berhasil'});
+                        else if (namaFungsi === 'getRekapBulanan') {
+                            var dr = [];
+                            for(var i=1; i<=15; i++) {
+                                var r = {nisn:'100'+i, nama:'Siswa Contoh '+i, kelas:(i%2===0?'VII-A':'VIII-A'), absensi:{}, statBulan: {H: 20, TL: 2, I: 1, S: 0, A: 0}, statTahun: {H: 150, TL: 10, I: 5, S: 2, A: 1}, statPerBulan: {}};
+                                for(var m=1; m<=12; m++) r.statPerBulan[m] = {H:10, TL:1, I:0, S:0, A:0};
+                                r.absensi[1] = 'Hadir'; r.absensi[2] = 'Terlambat'; r.absensi[6] = 'Hadir'; r.absensi[7] = 'Izin';
+                                dr.push(r);
+                            }
+                            sukses(dr);
+                        }
+                        else if (namaFungsi === 'getRekapIndividu') {
+                            var yrStats = {}; for(var m=1; m<=12; m++) yrStats[m] = {H:15, TL:1, I:1, S:0, A:0};
+                            var logData = [ {tanggal: '12/03/'+(args && args[1] ? args[1] : new Date().getFullYear()), status: 'Izin', ket: 'Acara keluarga'}, {tanggal: '15/03/'+(args && args[1] ? args[1] : new Date().getFullYear()), status: 'Terlambat', ket: '-'} ];
+                            sukses({ profile: { nama: 'Siswa Contoh ' + (args && args[0] ? args[0] : '1'), nisn: (args && args[0] ? args[0] : '1'), kelas: 'VII-A', foto: '' }, statsTahunan: yrStats, logDetail: logData });
+                        }
+                        else sukses({status: 'success', message: 'Aksi simulasi sukses'});
+                    }, 300);
+                };
+
+                if (GAS_URL && GAS_URL !== "") {
+                    fetch(GAS_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // Menghindari block CORS
+                        body: JSON.stringify({ action: namaFungsi, args: args || [] })
+                    })
+                    .then(function(res) { 
+                        if (!res.ok) throw new Error("HTTP " + res.status);
+                        return res.text(); 
+                    })
+                    .then(function(text) {
+                        try {
+                            var data = JSON.parse(text);
+                            if (data && data.error) {
+                                if (gagal) gagal(data.error);
+                            } else {
+                                if (sukses) sukses(data);
+                            }
+                        } catch(e) {
+                            throw new Error("Invalid JSON dari server.");
+                        }
+                    })
+                    .catch(function(err) {
+                        console.warn("Koneksi Server Error (" + namaFungsi + "):", err);
+                        console.info("Beralih ke Data Simulasi karena gagal menghubungi server.");
+                        jalankanSimulasi();
+                    });
+                } else if (typeof google !== 'undefined' && google.script && google.script.run) {
+                    var exec = google.script.run;
+                    if (sukses) exec = exec.withSuccessHandler(sukses);
+                    if (gagal) exec = exec.withFailureHandler(gagal);
+                    try {
+                        if (namaFungsi === 'loginAdmin') exec.loginAdmin(args[0]);
+                        else if (namaFungsi === 'catatAbsensi') exec.catatAbsensi(args[0]);
+                        else if (namaFungsi === 'getRekapData') exec.getRekapData();
+                        else if (namaFungsi === 'getDashboardData') exec.getDashboardData(args[0]);
+                        else if (namaFungsi === 'getDataSiswa') exec.getDataSiswa();
+                        else if (namaFungsi === 'getDaftarKelas') exec.getDaftarKelas();
+                        else if (namaFungsi === 'tambahKelas') exec.tambahKelas(args[0]);
+                        else if (namaFungsi === 'tambahSiswa') exec.tambahSiswa(args[0]);
+                        else if (namaFungsi === 'editSiswa') exec.editSiswa(args[0]);
+                        else if (namaFungsi === 'hapusSiswa') exec.hapusSiswa(args[0]);
+                        else if (namaFungsi === 'hapusBanyakSiswa') exec.hapusBanyakSiswa(args[0]);
+                        else if (namaFungsi === 'inputIzinSiswa') exec.inputIzinSiswa(args[0]);
+                        else if (namaFungsi === 'getPengaturan') exec.getPengaturan();
+                        else if (namaFungsi === 'simpanPengaturan') exec.simpanPengaturan(args[0]);
+                        else if (namaFungsi === 'getRekapBulanan') exec.getRekapBulanan(args[0], args[1], args[2]);
+                        else if (namaFungsi === 'getRekapIndividu') exec.getRekapIndividu(args[0], args[1]);
+                    } catch(err) { if (gagal) gagal(String(err)); }
+                } else {
+                    console.warn("Server terputus, masuk ke Mode Simulasi");
+                    jalankanSimulasi();
+                }
+            }
+        };
+
+        // ================= KUMPULAN FUNGSI TAMPILAN (UI) =================
+        function gantiTema() {
+            document.documentElement.classList.toggle('dark');
+            var ico = document.getElementById('theme-icon');
+            if (document.documentElement.classList.contains('dark')) {
+                if(ico) ico.className = 'fa-solid fa-sun text-xl';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                if(ico) ico.className = 'fa-solid fa-moon text-xl';
+                localStorage.setItem('theme', 'light');
+            }
+            if(document.getElementById('tab-dashboard').classList.contains('active')) muatDashboard(true);
+        }
+
+        function aturTemaAwal() {
+            if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+                var ico = document.getElementById('theme-icon');
+                if(ico) ico.className = 'fa-solid fa-sun text-xl';
+            }
+        }
+
+        function keHalaman(id) {
+            if (id !== 'view-absen' && State.kameraAktif) matikanScanner();
+            var els = document.querySelectorAll('.view-section');
+            for(var i=0; i<els.length; i++) els[i].classList.remove('active');
+            var target = document.getElementById(id);
+            if (target) target.classList.add('active');
+            var f = document.getElementById('main-footer');
+            if(f) f.style.display = (id === 'view-admin') ? 'none' : 'block';
+        }
+
+        function keTab(idTab) {
+            var btns = document.querySelectorAll('.tab-btn');
+            for(var i=0; i<btns.length; i++) {
+                if (btns[i].getAttribute('data-target') === idTab) { btns[i].setAttribute('data-active', 'true'); btns[i].classList.add('active'); }
+                else { btns[i].setAttribute('data-active', 'false'); btns[i].classList.remove('active'); }
+            }
+            var cons = document.querySelectorAll('.tab-content');
+            for(var j=0; j<cons.length; j++) cons[j].classList.remove('active');
+            var el = document.getElementById(idTab);
+            if(el) el.classList.add('active');
+            
+            if (idTab === 'tab-dashboard') muatDashboard(false);
+            if (idTab === 'tab-siswa') muatSiswa(false);
+            if (idTab === 'tab-rekap') { initFilterRekap(); submitRekap(); muatPengaturanSistem(true); } 
+            if (idTab === 'tab-setup') muatPengaturanSistem(false);
+        }
+
+        function switchModeRekap(mode) {
+            var btnKls = document.getElementById('btn-mode-kelas');
+            var btnInd = document.getElementById('btn-mode-individu');
+            var wadahKls = document.getElementById('rekap-mode-kelas');
+            var wadahInd = document.getElementById('rekap-mode-individu');
+
+            if (mode === 'kelas') {
+                btnKls.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-600 text-brand-700 dark:text-brand-300 shadow-sm transition-all pointer-events-none";
+                btnInd.className = "px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all smooth-hover";
+                wadahKls.classList.remove('hidden');
+                wadahInd.classList.add('hidden');
+            } else {
+                btnInd.className = "px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-600 text-brand-700 dark:text-brand-300 shadow-sm transition-all pointer-events-none";
+                btnKls.className = "px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all smooth-hover";
+                wadahKls.classList.add('hidden');
+                wadahInd.classList.remove('hidden');
+            }
+        }
+
+        // ================= KUMPULAN FUNGSI OTENTIKASI & ABSEN =================
+        function prosesLogin() {
+            var niy = document.getElementById('input-niy').value;
+            if (!niy) return Swal.fire('Peringatan', 'Harap isi NIY', 'warning');
+            var btn = document.getElementById('btn-login');
+            var teksAsli = btn.innerHTML; btn.innerHTML = 'Memeriksa...'; btn.disabled = true;
+            
+            Server.panggil('loginAdmin', [niy], function(res) {
+                btn.innerHTML = teksAsli; btn.disabled = false;
+                if (res && res.status === 'success') {
+                    document.getElementById('input-niy').value = '';
+                    document.getElementById('admin-name').innerText = 'Admin: ' + res.nama;
+                    var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama;
+                    var infoMob = document.getElementById('mobile-admin-info'); if (infoMob) { infoMob.classList.remove('hidden'); infoMob.classList.add('block'); }
+                    keHalaman('view-admin'); keTab('tab-dashboard'); muatPengaturanSistem(true); 
+                } else Swal.fire('Gagal', res ? res.message : 'NIY Salah', 'error');
+            }, function(err) { btn.innerHTML = teksAsli; btn.disabled = false; Swal.fire('Error', String(err), 'error'); });
+        }
+
+        function keluarAdmin() {
+            var infoMob = document.getElementById('mobile-admin-info');
+            if (infoMob) { infoMob.classList.add('hidden'); infoMob.classList.remove('block'); }
+            State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false;
+            keHalaman('view-absen'); Swal.fire({ icon: 'success', title: 'Keluar', toast: true, position: 'top-end', showConfirmButton: false, timer: 1500 });
+        }
+
+        function bukaKamera() {
+            if(typeof Html5Qrcode === 'undefined') return Swal.fire('Info', 'Sistem memuat. Coba beberapa detik lagi.', 'info');
+            document.getElementById('scanner-placeholder').style.display = 'none'; 
+            State.kamera = new Html5Qrcode("reader");
+            State.kamera.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
+                function(teks) { matikanScanner(); kirimAbsen(teks); }, function(err) {}
+            ).then(function() { State.kameraAktif = true; }).catch(function(e) {
+                document.getElementById('scanner-placeholder').style.display = 'flex'; 
+                Swal.fire('Kamera Error', 'Mohon izinkan akses kamera di browser Anda', 'error');
+            });
+        }
+
+        function matikanScanner() {
+            if (State.kamera && State.kameraAktif) {
+                State.kamera.stop().then(function() { State.kameraAktif = false; document.getElementById('scanner-placeholder').style.display = 'flex'; });
+            }
+            matikanNFC();
+        }
+
+        function matikanNFC() {
+            if (State.nfcController) {
+                State.nfcController.abort();
+                State.nfcController = null;
+            }
+        }
+
+        async function bukaNFC() {
+            if (!('NDEFReader' in window)) {
+                return Swal.fire('Tidak Didukung', 'Browser atau perangkat ini tidak mendukung fitur NFC. Gunakan Chrome di Android dan pastikan NFC aktif.', 'warning');
+            }
+            try {
+                State.nfcController = new AbortController();
+                const ndef = new NDEFReader();
+                await ndef.scan({ signal: State.nfcController.signal });
+                Swal.fire({ title: 'Siap Membaca', text: 'Silakan tempelkan Kartu RFID / NFC ke bagian belakang HP Anda.', icon: 'info', showCancelButton: true, confirmButtonText: 'Batal Membaca', allowOutsideClick: false }).then(function(r) {
+                    if (r.isConfirmed || r.isDismissed) matikanNFC();
+                });
+
+                ndef.onreading = event => {
+                    matikanNFC();
+                    Swal.close();
+                    const uid = event.serialNumber.replace(/:/g, '').toUpperCase();
+                    kirimAbsen(uid);
+                };
+                ndef.onreadingerror = () => {
+                    Swal.fire('Error', 'Gagal membaca kartu. Coba tempelkan lagi.', 'error');
+                };
+            } catch (error) {
+                Swal.fire('Error', 'NFC gagal diakses: ' + error.message, 'error');
+            }
+        }
+
+        async function bacaNFCPendaftaran(inputId) {
+            if (!('NDEFReader' in window)) {
+                return Swal.fire('Tidak Didukung', 'Browser atau perangkat ini tidak mendukung fitur NFC.', 'warning');
+            }
+            try {
+                State.nfcController = new AbortController();
+                const ndef = new NDEFReader();
+                await ndef.scan({ signal: State.nfcController.signal });
+                
+                var btn = document.getElementById('btn-baca-nfc');
+                if(btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Menunggu...';
+
+                ndef.onreading = event => {
+                    matikanNFC();
+                    const uid = event.serialNumber.replace(/:/g, '').toUpperCase();
+                    var inp = document.getElementById(inputId);
+                    if(inp) inp.value = uid;
+                    if(btn) btn.innerHTML = '<i class="fa-solid fa-wifi mr-1"></i> Tap NFC';
+                    Swal.fire({ icon: 'success', title: 'NFC Terbaca', text: 'UID: ' + uid, timer: 1500, showConfirmButton: false });
+                };
+                ndef.onreadingerror = () => {
+                    if(btn) btn.innerHTML = '<i class="fa-solid fa-wifi mr-1"></i> Tap NFC';
+                    Swal.fire({ icon: 'error', title: 'Gagal', text: 'Kartu tidak terbaca dengan baik. Coba lagi.', timer: 2000, showConfirmButton: false });
+                };
+            } catch (error) {
+                Swal.fire('Error', 'Gagal mengakses NFC. Pastikan aktif.', 'error');
+            }
+        }
+
+        function kirimManual() {
+            var n = document.getElementById('input-nisn').value;
+            if (!n) return Swal.fire('Peringatan', 'Masukkan NISN', 'warning');
+            var drop = document.getElementById('dropdown-siswa'); if(drop) drop.classList.add('hidden');
+            kirimAbsen(n); document.getElementById('input-nisn').value = '';
+        }
+
+        function kirimAbsen(nisn) {
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+            Server.panggil('catatAbsensi', [nisn], function(res) {
+                if(res && res.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Tercatat!', text: res.message, timer: 2000, showConfirmButton: false });
+                    setTimeout(function() { bukaKamera(); }, 2500); muatAbsenHariIni(true);
+                } else Swal.fire('Gagal', res ? res.message : 'Siswa tidak ditemukan/Sudah Absen', 'error');
+            }, function(err) { Swal.fire('Error', String(err), 'error'); });
+        }
+
+        function muatDataSiswaDropdown() {
+            Server.panggil('getDataSiswa', [], function(data) { State.dataSiswaAbsen = data || []; }, function(err) { console.error(err); });
+        }
+
+        function renderDropdownSiswa(kataKunci) {
+            var wadah = document.getElementById('dropdown-siswa');
+            if(!wadah) return;
+            var filter = (kataKunci || '').toLowerCase(); var hasil = [];
+            for (var i = 0; i < State.dataSiswaAbsen.length; i++) {
+                var s = State.dataSiswaAbsen[i];
+                if (s.nama.toLowerCase().indexOf(filter) > -1 || String(s.nisn).indexOf(filter) > -1) { hasil.push(s); }
+            }
+            if(hasil.length === 0) { wadah.innerHTML = '<div class="p-3 text-center text-sm text-gray-500">Siswa tidak ditemukan</div>'; return; }
+            var isi = '';
+            for(var j = 0; j < hasil.length; j++) {
+                var cur = hasil[j];
+                var img = cur.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(cur.nama) + '&background=random';
+                isi += '<div class="flex items-center p-3 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors dropdown-item" data-nisn="' + cur.nisn + '">' +
+                            '<img src="' + img + '" class="w-8 h-8 rounded-full object-cover mr-3 shadow-sm">' +
+                            '<div class="text-left overflow-hidden pointer-events-none">' +
+                                '<div class="text-sm font-bold text-gray-800 dark:text-white truncate">' + cur.nama + '</div>' +
+                                '<div class="text-[10px] text-brand-600 dark:text-brand-400 font-medium">' + cur.nisn + ' &bull; Kelas ' + cur.kelas + '</div>' +
+                            '</div>' +
+                        '</div>';
+            }
+            wadah.innerHTML = isi;
+        }
+
+        function pilihSiswaDropdown(nisn) { document.getElementById('input-nisn').value = nisn; document.getElementById('dropdown-siswa').classList.add('hidden'); }
+
+        function setupDropdownEvent() {
+            var input = document.getElementById('input-nisn'); var drop = document.getElementById('dropdown-siswa');
+            if(!input || !drop) return;
+            input.addEventListener('focus', function() { drop.classList.remove('hidden'); renderDropdownSiswa(this.value); });
+            input.addEventListener('input', function() { drop.classList.remove('hidden'); renderDropdownSiswa(this.value); });
+            document.addEventListener('click', function(e) { if(!input.contains(e.target) && !drop.contains(e.target)) drop.classList.add('hidden'); });
+        }
+
+        function muatAbsenHariIni(forceRefresh) {
+            var list = document.getElementById('list-tidak-masuk');
+            if (!list) return;
+            if (State.absenHariIniLoaded && !forceRefresh) return;
+            if (!State.absenHariIniLoaded || list.innerHTML.indexOf('Memuat data') > -1) list.innerHTML = '<li class="p-5 text-center text-gray-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat data...</li>';
+            
+            Server.panggil('getRekapData', [], function(data) {
+                State.absenHariIniLoaded = true;
+                if(!data || data.length === 0) return list.innerHTML = '<li class="p-5 text-center text-gray-400 text-xs italic">Semua siswa masuk hari ini. 🎉</li>';
+                var d = new Date(); var tgl = ("0" + d.getDate()).slice(-2) + "/" + ("0" + (d.getMonth() + 1)).slice(-2) + "/" + d.getFullYear();
+                var absen = [];
+                for(var i=0; i<data.length; i++) {
+                    var r = data[i]; var s = r.status.toLowerCase();
+                    if(r.waktu.indexOf(tgl) > -1 && (s.indexOf('alpa') > -1 || s.indexOf('izin') > -1 || s.indexOf('sakit') > -1)) { absen.push(r); }
+                }
+                if(absen.length === 0) return list.innerHTML = '<li class="p-5 text-center text-gray-400 text-xs italic">Semua siswa masuk hari ini. 🎉</li>';
+                var isi = '';
+                for(var j=0; j<absen.length; j++) {
+                    var baris = absen[j]; var st = baris.status.toLowerCase();
+                    var c = st.indexOf('izin') > -1 ? 'text-amber-500' : (st.indexOf('sakit') > -1 ? 'text-blue-500' : 'text-rose-500');
+                    isi += '<li class="p-3 flex justify-between items-center border-b border-gray-100 dark:border-gray-700">' +
+                                '<div class="flex items-center space-x-3"><div class="h-8 w-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center font-bold text-xs ' + c + '">' + baris.nama.charAt(0) + '</div><div><p class="text-xs font-bold dark:text-gray-200">' + baris.nama + '</p><p class="text-[10px] text-gray-500">' + baris.kelas + '</p></div></div>' +
+                                '<div class="text-right"><p class="text-[9px] font-bold ' + c + ' uppercase">' + baris.status + '</p></div>' +
+                            '</li>';
+                }
+                list.innerHTML = isi;
+            });
+        }
+
+        // ================= KUMPULAN FUNGSI DASHBOARD =================
+        function muatLogDashboard(forceRefresh) {
+            var list = document.getElementById('list-log-dashboard'); if (!list) return;
+            if (State.rekapLogLoaded && !forceRefresh) return;
+            if (!State.rekapLogLoaded) list.innerHTML = '<li class="p-4 text-center text-gray-400 text-xs"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Memuat log...</li>';
+
+            Server.panggil('getRekapData', [], function(data) {
+                State.rekapLogLoaded = true;
+                if(!data || data.length === 0) return list.innerHTML = '<li class="p-4 text-center text-gray-400 text-xs">Belum ada data kehadiran.</li>';
+                var isi = ''; var maxItem = Math.min(data.length, 5); 
+                for(var i=0; i<maxItem; i++) {
+                    var r = data[i]; var st = String(r.status).toLowerCase();
+                    var color = 'text-brand-600 dark:text-brand-400'; var bg = 'bg-brand-50 dark:bg-brand-900/30'; var icon = 'fa-check';
+                    if (st.indexOf('terlambat') > -1) { color = 'text-amber-500'; bg = 'bg-amber-50 dark:bg-amber-900/30'; icon = 'fa-clock'; }
+                    else if (st.indexOf('izin') > -1) { color = 'text-orange-500'; bg = 'bg-orange-50 dark:bg-orange-900/30'; icon = 'fa-envelope-open-text'; }
+                    else if (st.indexOf('sakit') > -1) { color = 'text-sky-500'; bg = 'bg-sky-50 dark:bg-sky-900/30'; icon = 'fa-briefcase-medical'; }
+                    else if (st.indexOf('alpa') > -1) { color = 'text-rose-500'; bg = 'bg-rose-50 dark:bg-rose-900/30'; icon = 'fa-xmark'; }
+                    
+                    isi += '<li class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><div class="flex items-center space-x-4"><div class="h-10 w-10 rounded-full ' + bg + ' ' + color + ' flex items-center justify-center text-xs shadow-sm"><i class="fa-solid ' + icon + '"></i></div><div><p class="text-xs font-bold text-gray-800 dark:text-gray-200">' + r.nama + '</p><p class="text-[10px] text-gray-500">' + r.kelas + ' &bull; ' + r.waktu + '</p></div></div><div class="text-right"><span class="px-2.5 py-1 rounded border border-current text-[9px] font-bold uppercase ' + color + ' ' + bg + '">' + r.status + '</span></div></li>';
+                }
+                list.innerHTML = isi;
+            });
+        }
+
+        function muatDashboard(forceRefresh, tahunTerpilih) {
+            muatLogDashboard(forceRefresh); 
+            var tahunReq = tahunTerpilih || new Date().getFullYear();
+            var selTahun = document.getElementById('global-tahun-dashboard');
+            if (selTahun && (!selTahun.getAttribute('data-init') || forceRefresh)) selTahun.innerHTML = '<option>Memuat...</option>';
+
+            Server.panggil('getDashboardData', [tahunReq], function(data) {
+                try {
+                    if(!data || typeof data !== 'object') data = {};
+                    var d_totalSiswa = data.totalSiswa || 0; var d_totalKelas = data.totalKelas || 0;
+                    var d_putra = data.putra || 0; var d_putri = data.putri || 0;
+                    var d_availYears = data.availableYears || [tahunReq];
+                    var d_tren = data.trenBulanan || { hadir: [0,0,0,0,0,0,0,0,0,0,0,0], terlambat: [0,0,0,0,0,0,0,0,0,0,0,0], izinSakit: [0,0,0,0,0,0,0,0,0,0,0,0], alpa: [0,0,0,0,0,0,0,0,0,0,0,0] };
+
+                    if (!tahunTerpilih) State.dashboardLoaded = true;
+                    
+                    document.getElementById('stat-siswa').innerText = d_totalSiswa; document.getElementById('stat-kelas').innerText = d_totalKelas;
+                    document.getElementById('stat-putra').innerText = d_putra; document.getElementById('stat-putri').innerText = d_putri;
+
+                    if(selTahun && (!selTahun.getAttribute('data-init') || forceRefresh)) {
+                        var yearMap = {}; for(var y=0; y<d_availYears.length; y++){ if(d_availYears[y]) yearMap[d_availYears[y]] = true; }
+                        var currentY = new Date().getFullYear(); var minYear = Math.min(2022, currentY - 2); 
+                        for(var y=minYear; y<=2030; y++) { yearMap[y] = true; }
+                        var sortedYears = Object.keys(yearMap).map(Number).sort(function(a, b){ return b - a; });
+                        var optHTML = '';
+                        for(var y=0; y<sortedYears.length; y++){ var yr = sortedYears[y]; optHTML += '<option value="'+yr+'" '+(yr == tahunReq ? 'selected' : '')+'>'+yr+'</option>'; }
+                        selTahun.innerHTML = optHTML; selTahun.value = tahunReq; selTahun.setAttribute('data-init', 'true');
+                    }
+
+                    var sumHadir = d_tren.hadir.reduce(function(a,b){return a+b}, 0); var sumTerlambat = d_tren.terlambat.reduce(function(a,b){return a+b}, 0);
+                    var sumIzinSakit = d_tren.izinSakit.reduce(function(a,b){return a+b}, 0); var sumAlpa = d_tren.alpa.reduce(function(a,b){return a+b}, 0);
+                    var totalAbsen = sumHadir + sumTerlambat + sumIzinSakit + sumAlpa;
+
+                    var pctHadir = totalAbsen > 0 ? ((sumHadir / totalAbsen) * 100).toFixed(1) : 0;
+                    var pctTerlambat = totalAbsen > 0 ? ((sumTerlambat / totalAbsen) * 100).toFixed(1) : 0;
+                    var pctAlpa = totalAbsen > 0 ? ((sumAlpa / totalAbsen) * 100).toFixed(1) : 0;
+
+                    document.getElementById('card-tepat-val').innerText = sumHadir + (totalAbsen > 0 ? '/' + totalAbsen : '');
+                    document.getElementById('card-tepat-pct').innerHTML = '<span class="hidden md:inline">Presensi </span>Tepat<span class="hidden md:inline"> Waktu</span> ' + pctHadir + '%';
+                    document.getElementById('card-lambat-val').innerText = sumTerlambat + (totalAbsen > 0 ? '/' + totalAbsen : '');
+                    document.getElementById('card-lambat-pct').innerHTML = 'Terlambat<span class="hidden md:inline"> Masuk</span> ' + pctTerlambat + '%';
+                    document.getElementById('card-alpa-val').innerText = sumAlpa + (totalAbsen > 0 ? '/' + totalAbsen : '');
+                    document.getElementById('card-alpa-pct').innerHTML = '<span class="hidden md:inline">Tidak Absen</span><span class="md:hidden">Alpa</span> ' + pctAlpa + '%';
+
+                    var yearLabels = document.querySelectorAll('.lbl-tahun-card');
+                    for(var yL=0; yL<yearLabels.length; yL++) { yearLabels[yL].innerText = tahunReq; }
+
+                    if (typeof Chart !== 'undefined') {
+                        Chart.defaults.color = document.documentElement.classList.contains('dark') ? '#cbd5e1' : '#475569'; Chart.defaults.font.family = 'Inter';
+                        if(State.pChart && (!tahunTerpilih || forceRefresh)) { State.pChart.destroy(); State.pChart = null; }
+                        if (!State.pChart) {
+                            State.pChart = new Chart(document.getElementById('chart-pie'), { type: 'doughnut', data: { labels: ['Hadir', 'Terlambat', 'Izin/Sakit', 'Alpa'], datasets: [{ data: [sumHadir, sumTerlambat, sumIzinSakit, sumAlpa], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#e11d48'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: {boxWidth: 10, font: {size: 10, family: 'Inter'}} } } } });
+                        }
+                        if(State.bChart) State.bChart.destroy();
+                        State.bChart = new Chart(document.getElementById('chart-bar'), { type: 'bar', data: { labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'], datasets: [ { label: 'Tepat Waktu', data: d_tren.hadir, backgroundColor: '#86efac' }, { label: 'Terlambat Masuk', data: d_tren.terlambat, backgroundColor: '#fde047' }, { label: 'Izin / Sakit', data: d_tren.izinSakit, backgroundColor: '#fdba74' }, { label: 'Tidak Absen (Alpa)', data: d_tren.alpa, backgroundColor: '#fb7185' } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: { display: false } }, y: { stacked: true, border: {display: false} } }, plugins: { legend: { display: true, position: 'top', labels: {usePointStyle: true, boxWidth: 6, font: {size: 9, family: 'Inter'}} } } } });
+                    }
+                } catch(errRender) { console.error("Dashboard Error:", errRender); }
+            }, function(err) { console.error("API Error:", err); });
+        }
+
+        // ================= KUMPULAN FUNGSI CRUD SISWA =================
+        function renderTabelSiswa() {
+            var t = document.getElementById('tabel-siswa');
+            var paginationInfo = document.getElementById('pagination-siswa');
+            var btnPrev = document.getElementById('btn-prev-siswa');
+            var btnNext = document.getElementById('btn-next-siswa');
+            var infoPage = document.getElementById('info-page-siswa');
+
+            if (State.dataSiswa.length === 0) {
+                t.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-500 font-medium">Data Kosong</td></tr>';
+                if(paginationInfo) paginationInfo.classList.add('hidden');
+                return;
+            }
+            if(paginationInfo) paginationInfo.classList.remove('hidden');
+
+            var totalPages = Math.ceil(State.dataSiswa.length / State.itemsPerPageSiswa);
+            if (State.currentPageSiswa > totalPages) State.currentPageSiswa = totalPages;
+            if (State.currentPageSiswa < 1) State.currentPageSiswa = 1;
+
+            var startIdx = (State.currentPageSiswa - 1) * State.itemsPerPageSiswa;
+            var endIdx = startIdx + State.itemsPerPageSiswa;
+            var currentData = State.dataSiswa.slice(startIdx, endIdx);
+
+            var isi = '';
+            for(var i = 0; i < currentData.length; i++) {
+                var r = currentData[i]; var originalIdx = startIdx + i;
+                var img = r.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(r.nama) + '&background=random';
+                isi += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><td class="px-4 py-3 text-center"><input type="checkbox" value="' + r.nisn + '" data-action="periksaCentang" class="cek-siswa w-4 h-4 rounded cursor-pointer accent-brand-600 relative z-20"></td><td class="px-4 py-3 text-center"><img src="' + img + '" class="w-10 h-10 rounded-full object-cover mx-auto shadow-sm" alt="img"></td><td class="px-4 py-3 font-mono text-xs font-semibold text-gray-500 dark:text-gray-400">' + r.nisn + '</td><td class="px-4 py-3 font-bold text-gray-800 dark:text-gray-200">' + r.nama + '</td><td class="px-4 py-3 font-medium">' + r.kelas + '</td><td class="px-4 py-3 font-medium">' + r.wa + '</td><td class="px-4 py-3 text-center space-x-2 flex justify-center"><button type="button" data-action="editSiswa" data-idx="' + originalIdx + '" class="text-brand-500 bg-brand-50 hover:bg-brand-100 dark:bg-gray-800 dark:hover:bg-gray-700 p-2 rounded-lg smooth-hover relative z-20"><i class="fa-solid fa-pen-to-square pointer-events-none"></i></button><button type="button" data-action="hapusSiswaPribadi" data-nisn="' + r.nisn + '" data-nama="' + r.nama + '" class="text-rose-500 bg-rose-50 hover:bg-rose-100 dark:bg-gray-800 dark:hover:bg-gray-700 p-2 rounded-lg smooth-hover relative z-20"><i class="fa-solid fa-trash pointer-events-none"></i></button></td></tr>';
+            }
+            t.innerHTML = isi;
+            if(infoPage) infoPage.innerText = 'Halaman ' + State.currentPageSiswa + ' dari ' + totalPages;
+            if(btnPrev) btnPrev.disabled = State.currentPageSiswa === 1;
+            if(btnNext) btnNext.disabled = State.currentPageSiswa === totalPages;
+
+            var checkSemua = document.getElementById('check-semua');
+            if(checkSemua) checkSemua.checked = false;
+            periksaCentang();
+        }
+
+        function periksaCentang() {
+            var j = document.querySelectorAll('.cek-siswa:checked').length;
+            var b = document.getElementById('btn-hapus-masal');
+            if (j > 0) { b.classList.remove('hidden'); b.innerText = 'Hapus Terpilih (' + j + ')'; } else b.classList.add('hidden');
+        }
+
+        function centangSemua(el) { document.querySelectorAll('.cek-siswa').forEach(function(c) { c.checked = el.checked; }); periksaCentang(); }
+        function prevSiswa() { if (State.currentPageSiswa > 1) { State.currentPageSiswa--; renderTabelSiswa(); } }
+        function nextSiswa() { var totalPages = Math.ceil(State.dataSiswa.length / State.itemsPerPageSiswa); if (State.currentPageSiswa < totalPages) { State.currentPageSiswa++; renderTabelSiswa(); } }
+
+        function tambahKelas() {
+            Swal.fire({ title: 'Kelas Baru', input: 'text', placeholder: 'Contoh: VII-C', showCancelButton: true, confirmButtonText: 'Simpan', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937' }).then(function(r) {
+                if(r.isConfirmed && r.value) {
+                    Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
+                    Server.panggil('tambahKelas', [r.value], function(res) { Swal.fire('Berhasil', res.message, 'success'); });
+                }
+            });
+        }
+
+        function tambahAdmin() { alert('Tambahkan Admin di Google Sheets (Sheet Data_Admin).'); }
+        function bukaFolder() { window.open('https://drive.google.com/drive/folders/1S_heRm5OpqRT3m3P3khPGPOTVFFzBtYP', '_blank'); }
+
+        function tambahSiswa() {
+            Server.panggil('getDaftarKelas', [], function(dk) {
+                var op = '<option value="">-- Pilih --</option>';
+                if(dk) { for(var i=0; i<dk.length; i++) { op += '<option value="' + dk[i] + '">' + dk[i] + '</option>'; } }
+                var isiHTML = '<div class="space-y-2 mt-1 text-left"><div class="flex flex-col items-center mb-3"><div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-brand-500 overflow-hidden flex items-center justify-center mb-2 shadow-sm"><img id="preview-foto" src="https://ui-avatars.com/api/?name=Siswa&background=random" class="w-full h-full object-cover"></div><input type="hidden" id="s-foto-b64" value=""><label class="cursor-pointer text-[10px] bg-brand-100 text-brand-600 px-3 py-1 rounded-full font-bold hover:bg-brand-200 smooth-hover shadow-sm"><i class="fa-solid fa-camera mr-1"></i> Pilih Foto <input type="file" accept="image/*" class="hidden" onchange="compressImage(this)"></label></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">NISN</label><input id="s-n" type="text" inputmode="numeric" pattern="[0-9]*" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Masukkan NISN"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Nama Lengkap</label><input id="s-nm" type="text" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Nama Lengkap"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Kelas</label><select id="s-k" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all">' + op + '</select></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">No. WA</label><input id="s-w" type="text" inputmode="numeric" pattern="[0-9]*" value="" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Contoh: 0812..."></div><div class="pt-2"><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">UID RFID / NFC (Opsional)</label><div class="flex space-x-2"><input id="s-rfid" type="text" class="flex-grow border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 text-sm transition-all" placeholder="ID Kartu NFC"><button type="button" id="btn-baca-nfc" onclick="bacaNFCPendaftaran(\'s-rfid\')" class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-wifi mr-1"></i> Tap NFC</button></div></div></div>';
+                Swal.fire({
+                    title: '<h3 class="text-xl font-bold">Siswa Baru</h3>', html: isiHTML, showCancelButton: true, confirmButtonText: 'Simpan Data', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937',
+                    preConfirm: function() {
+                        var nisn = document.getElementById('s-n').value; var nama = document.getElementById('s-nm').value;
+                        var kelas = document.getElementById('s-k').value; var wa = document.getElementById('s-w').value; var fotoB64 = document.getElementById('s-foto-b64').value; var rfid = document.getElementById('s-rfid').value;
+                        if (!nisn || !nama || !kelas || !wa) { Swal.showValidationMessage('Lengkapi semua data!'); return false; }
+                        return { nisn: nisn, nama: nama, kelas: kelas, wa: wa, foto: fotoB64, rfid: rfid };
+                    }
+                }).then(function(h) {
+                    if (h.isConfirmed) {
+                        matikanNFC();
+                        Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
+                        Server.panggil('tambahSiswa', [h.value], function(res) { Swal.fire('Sukses', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
+                    }
+                });
+            });
+        }
+
+        function editSiswa(idx) {
+            var dt = State.dataSiswa[idx];
+            Server.panggil('getDaftarKelas', [], function(dk) {
+                var op = '';
+                if(dk) { for(var i=0; i<dk.length; i++) { op += '<option value="' + dk[i] + '" ' + (dk[i]===dt.kelas?'selected':'') + '>' + dk[i] + '</option>'; } }
+                var currentImg = dt.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(dt.nama) + '&background=random';
+                var currentRfid = dt.rfid || '';
+                var isiHTML = '<div class="space-y-2 mt-1 text-left"><input type="hidden" id="s-nl" value="' + dt.nisn + '"><div class="flex flex-col items-center mb-3"><div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-brand-500 overflow-hidden flex items-center justify-center mb-2 shadow-sm"><img id="preview-foto" src="' + currentImg + '" class="w-full h-full object-cover"></div><input type="hidden" id="s-foto-b64" value="' + (dt.foto || '') + '"><label class="cursor-pointer text-[10px] bg-brand-100 text-brand-600 px-3 py-1 rounded-full font-bold hover:bg-brand-200 smooth-hover shadow-sm"><i class="fa-solid fa-camera mr-1"></i> Ubah Foto <input type="file" accept="image/*" class="hidden" onchange="compressImage(this)"></label></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">NISN</label><input id="s-n" type="text" inputmode="numeric" pattern="[0-9]*" value="' + dt.nisn + '" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Nama Lengkap</label><input id="s-nm" type="text" value="' + dt.nama + '" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Kelas</label><select id="s-k" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 mt-1 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all">' + op + '</select></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">No. WA</label><input id="s-w" type="text" inputmode="numeric" pattern="[0-9]*" value="' + dt.wa + '" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all"></div><div class="pt-2"><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">UID RFID / NFC (Opsional)</label><div class="flex space-x-2"><input id="s-rfid" type="text" value="' + currentRfid + '" class="flex-grow border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 text-sm transition-all" placeholder="ID Kartu NFC"><button type="button" id="btn-baca-nfc" onclick="bacaNFCPendaftaran(\'s-rfid\')" class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-wifi mr-1"></i> Tap NFC</button></div></div></div>';
+                Swal.fire({
+                    title: '<h3 class="text-xl font-bold">Ubah Data Siswa</h3>', html: isiHTML, showCancelButton: true, confirmButtonText: 'Update Data', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937',
+                    preConfirm: function() {
+                        var nl = document.getElementById('s-nl').value; var nisn = document.getElementById('s-n').value;
+                        var nama = document.getElementById('s-nm').value; var kelas = document.getElementById('s-k').value; var wa = document.getElementById('s-w').value; var fotoB64 = document.getElementById('s-foto-b64').value; var rfid = document.getElementById('s-rfid').value;
+                        if (!nisn || !nama || !kelas || !wa) { Swal.showValidationMessage('Isi semua!'); return false; }
+                        return { nisnLama: nl, nisn: nisn, nama: nama, kelas: kelas, wa: wa, foto: fotoB64, rfid: rfid }; 
+                    }
+                }).then(function(h) {
+                    if (h.isConfirmed) {
+                        matikanNFC();
+                        Swal.fire({title: 'Memperbarui...', didOpen: function() { Swal.showLoading(); }});
+                        Server.panggil('editSiswa', [h.value], function(res) { Swal.fire('Tersimpan', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
+                    }
+                });
+            });
+        }
+
+        function hapusSiswaPribadi(nisn, nama) {
+            Swal.fire({ title: 'Hapus', html: 'Yakin menghapus <b>' + nama + '</b>?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya' }).then(function(r) { 
+                if (r.isConfirmed) { 
+                    Swal.fire({title: 'Menghapus...', didOpen: function() { Swal.showLoading(); }});
+                    Server.panggil('hapusSiswa', [nisn], function(res) { Swal.fire('Dihapus', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
+                } 
+            });
+        }
+
+        function tindakHapusMasal() {
+            var cb = document.querySelectorAll('.cek-siswa:checked'); var nArr = [];
+            for(var i=0; i<cb.length; i++) { nArr.push(cb[i].value); }
+            if(nArr.length === 0) return;
+            Swal.fire({ title: 'Hapus ' + nArr.length + ' Siswa?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya' }).then(function(r) { 
+                if (r.isConfirmed) { 
+                    Swal.fire({title: 'Menghapus...', didOpen: function() { Swal.showLoading(); }});
+                    Server.panggil('hapusBanyakSiswa', [nArr], function(res) { Swal.fire('Dihapus', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
+                } 
+            });
+        }
+
+        function muatSiswa(forceRefresh) {
+            if (State.siswaLoaded && !forceRefresh) { renderTabelSiswa(); return; }
+            var t = document.getElementById('tabel-siswa'); document.getElementById('btn-hapus-masal').classList.add('hidden');
+            var paginationInfo = document.getElementById('pagination-siswa');
+            if (!State.siswaLoaded) { if(paginationInfo) paginationInfo.classList.add('hidden'); t.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat...</td></tr>'; }
+            
+            Server.panggil('getDataSiswa', [], function(data) {
+                State.dataSiswa = data || [];
+                if (!State.siswaLoaded || forceRefresh) State.currentPageSiswa = 1;
+                State.siswaLoaded = true; renderTabelSiswa();
+            }, function(err) { if (!State.siswaLoaded) t.innerHTML = '<tr><td colspan="7" class="text-center text-rose-500 p-4">Error memuat data</td></tr>'; });
+        }
+
+
+        // ================= KUMPULAN FUNGSI REKAPITULASI & CETAK =================
+        function initFilterRekap() {
+            var cbBulan = document.getElementById('filter-bulan');
+            var cbTahun = document.getElementById('filter-tahun');
+            var cbTahunIndividu = document.getElementById('filter-tahun-individu');
+            
+            var d = new Date(); var year = d.getFullYear();
+            var minYear = Math.min(2022, year - 2); var maxYear = Math.max(2030, year + 1);
+            var optTahun = '';
+            for (var i = maxYear; i >= minYear; i--) optTahun += '<option value="' + i + '" ' + (i === year ? 'selected' : '') + '>' + i + '</option>';
+
+            if(cbBulan && !cbBulan.getAttribute('data-init')) {
+                cbBulan.value = d.getMonth() + 1;
+                if(cbTahun) cbTahun.innerHTML = optTahun;
+                if(cbTahunIndividu) cbTahunIndividu.innerHTML = optTahun;
+                cbBulan.setAttribute('data-init', 'true');
+            }
+
+            var cbKelas = document.getElementById('filter-kelas');
+            var cbKelasInd = document.getElementById('filter-kelas-individu');
+            var cbSetupWali = document.getElementById('setup-kelas-wali');
+
+            if (cbKelas && cbKelas.options.length <= 1) {
+                Server.panggil('getDaftarKelas', [], function(res) {
+                    var optSemua = '<option value="Semua">Semua Kelas</option>';
+                    var optPilih = '<option value="">-- Pilih Kelas --</option>';
+                    var optBody = '';
+                    if(res) { for(var i=0; i<res.length; i++) { optBody += '<option value="' + res[i] + '">' + res[i] + '</option>'; } }
+                    if (cbKelas) cbKelas.innerHTML = optSemua + optBody;
+                    if (cbKelasInd) cbKelasInd.innerHTML = optPilih + optBody;
+                    if (cbSetupWali) cbSetupWali.innerHTML = optPilih + optBody;
+                });
+            }
+        }
+
+        function muatDataSiswaUntukIndividu(kelasFilter) {
+            var sel = document.getElementById('filter-siswa-individu');
+            if(!sel) return; 
+
+            if(!kelasFilter) {
+                sel.innerHTML = '<option value="">-- Pilih Kelas Dahulu --</option>';
+                sel.disabled = true;
+                return;
+            }
+
+            sel.disabled = false;
+            sel.innerHTML = '<option value="">Memuat...</option>';
+
+            Server.panggil('getDataSiswa', [], function(data) {
+                State.dataSiswaAbsen = data || [];
+                var html = '<option value="">-- Pilih Siswa --</option>';
+                var sorted = data.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
+                var ada = false;
+                var klsTujuan = String(kelasFilter).trim().toLowerCase();
+                for(var i=0; i<sorted.length; i++) {
+                    if (String(sorted[i].kelas).trim().toLowerCase() === klsTujuan) {
+                        html += '<option value="'+sorted[i].nisn+'">' + sorted[i].nama + '</option>';
+                        ada = true;
+                    }
+                }
+                if (!ada) html = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+                sel.innerHTML = html;
+            });
+        }
+
+        function jalankanCetakPDF(mode) {
+            document.body.setAttribute('data-print-mode', mode);
+            
+            var kelas = document.getElementById('filter-kelas').value || 'Semua';
+            var tahun = document.getElementById('filter-tahun').value || new Date().getFullYear();
+            var namaBulan = '';
+            
+            var pageStyle = document.getElementById('dynamic-print-style');
+            if (!pageStyle) {
+                pageStyle = document.createElement('style');
+                pageStyle.id = 'dynamic-print-style';
+                document.head.appendChild(pageStyle);
+            }
+
+            if (mode === 'individu') {
+                pageStyle.innerHTML = '@media print { @page { size: A4 portrait !important; margin: 10mm; } body[data-print-mode="individu"] #wrap-rekap-individu { zoom: 0.95; } }';
+                tahun = document.getElementById('filter-tahun-individu').value || new Date().getFullYear();
+                var namaSiswaRaw = document.getElementById('ind-nama').innerText;
+                var kelasIndv = document.getElementById('ind-kelas').innerText;
+                kelas = namaSiswaRaw.replace(/\s+/g, '_');
+                
+                var wkInd = State.waliKelasData[kelasIndv] || 'Nama Wali Kelas, S.Pd.';
+                document.getElementById('lbl-ttd-nama').innerText = wkInd;
+            } else {
+                pageStyle.innerHTML = '@media print { @page { size: A4 landscape !important; margin: 10mm; } body[data-print-mode="tahunan"] #wrap-rekap-tahunan { zoom: 0.85; } }';
+                if (mode === 'bulanan') {
+                    var valBulan = document.getElementById('filter-bulan').value || (new Date().getMonth() + 1);
+                    var arrBulan = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+                    namaBulan = '_' + arrBulan[parseInt(valBulan) - 1];
+                }
+                var wkBiasa = (kelas === 'Semua') ? '....................................' : (State.waliKelasData[kelas] || 'Nama Wali Kelas, S.Pd.');
+                document.getElementById('lbl-ttd-nama').innerText = wkBiasa;
+            }
+            
+            var d = new Date();
+            var strWaktu = d.getFullYear() + ("0"+(d.getMonth()+1)).slice(-2) + ("0"+d.getDate()).slice(-2) + "_" + ("0"+d.getHours()).slice(-2) + ("0"+d.getMinutes()).slice(-2);
+            
+            var judulAsli = document.title;
+            var judulParentAsli = "SMARTIS - SMP Unggulan Abu Zairi";
+            var modeTxt = mode === 'bulanan' ? "Bulanan" + namaBulan : (mode === 'tahunan' ? "Tahunan" : "Individu");
+            var namaBaru = "Rekap_" + modeTxt + "_" + tahun + "_" + kelas + "_" + strWaktu;
+            
+            var inpKota = document.getElementById('setup-kota');
+            var kotaCetak = (inpKota && inpKota.value) ? inpKota.value : State.kota;
+            document.getElementById('lbl-ttd-tempat-tgl').innerText = kotaCetak + ", " + formatTanggalIndo(d);
+
+            document.title = namaBaru;
+            try { judulParentAsli = window.parent.document.title; window.parent.document.title = namaBaru; } catch(e) {}
+            try { window.top.document.title = namaBaru; } catch(e) {}
+            
+            setTimeout(function(){ 
+                window.print(); 
+                setTimeout(function(){ 
+                    document.title = judulAsli; 
+                    try { window.parent.document.title = judulParentAsli; } catch(e) {}
+                    try { window.top.document.title = judulParentAsli; } catch(e) {}
+                }, 2000);
+            }, 800);
+        }
+
+        function submitRekapIndividu() {
+            var nisn = document.getElementById('filter-siswa-individu').value;
+            var tahun = document.getElementById('filter-tahun-individu').value;
+            
+            if(!nisn) return Swal.fire('Peringatan', 'Silakan pilih siswa terlebih dahulu', 'warning');
+            
+            var btn = document.getElementById('btn-submit-rekap-individu');
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Load'; btn.disabled = true;
+            document.getElementById('wrap-rekap-individu').classList.add('hidden');
+            document.getElementById('btn-print-individu').classList.add('hidden');
+
+            Server.panggil('getRekapIndividu', [nisn, tahun], function(res) {
+                btn.innerHTML = 'Tampilkan'; btn.disabled = false;
+                
+                if(res && res.profile) {
+                    document.getElementById('wrap-rekap-individu').classList.remove('hidden');
+                    document.getElementById('btn-print-individu').classList.remove('hidden');
+                    
+                    document.getElementById('print-subtitle-individu').innerText = "Tahun Akademik " + tahun;
+
+                    var profileImg = res.profile.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(res.profile.nama) + '&background=random';
+                    document.getElementById('ind-foto').src = profileImg;
+                    document.getElementById('ind-nama').innerText = res.profile.nama;
+                    document.getElementById('ind-nisn').innerText = res.profile.nisn;
+                    document.getElementById('ind-kelas').innerText = res.profile.kelas;
+
+                    var tbodyTahun = document.getElementById('tbody-individu-tahunan');
+                    var htmlTahun = '';
+                    var total = {H:0, TL:0, I:0, S:0, A:0};
+                    var blnArr = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                    
+                    for(var m=1; m<=12; m++) {
+                        var st = res.statsTahunan[m] || {H:0, TL:0, I:0, S:0, A:0};
+                        total.H += st.H; total.TL += st.TL; total.I += st.I; total.S += st.S; total.A += st.A;
+                        htmlTahun += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">' +
+                                        '<td class="p-2 font-semibold text-left pl-4 border border-gray-200 dark:border-gray-600">' + blnArr[m-1] + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600">' + (st.H || '-') + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600">' + (st.TL || '-') + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600">' + (st.I || '-') + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600">' + (st.S || '-') + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600">' + (st.A || '-') + '</td>' +
+                                     '</tr>';
+                    }
+                    htmlTahun += '<tr class="bg-gray-100 dark:bg-gray-700 font-black">' +
+                                    '<td class="p-2 text-right pr-4 border border-gray-200 dark:border-gray-600 uppercase">Total</td>' +
+                                    '<td class="p-2 text-emerald-600 dark:text-emerald-400 border border-gray-200 dark:border-gray-600">' + total.H + '</td>' +
+                                    '<td class="p-2 text-amber-600 dark:text-amber-400 border border-gray-200 dark:border-gray-600">' + total.TL + '</td>' +
+                                    '<td class="p-2 text-orange-600 dark:text-orange-400 border border-gray-200 dark:border-gray-600">' + total.I + '</td>' +
+                                    '<td class="p-2 text-brand-600 dark:text-brand-400 border border-gray-200 dark:border-gray-600">' + total.S + '</td>' +
+                                    '<td class="p-2 text-rose-600 dark:text-rose-400 border border-gray-200 dark:border-gray-600">' + total.A + '</td>' +
+                                 '</tr>';
+                    tbodyTahun.innerHTML = htmlTahun;
+
+                    var tbodyLog = document.getElementById('tbody-individu-log');
+                    if(!res.logDetail || res.logDetail.length === 0) {
+                        tbodyLog.innerHTML = '<tr><td colspan="4" class="p-6 text-center text-gray-400 italic border border-gray-200 dark:border-gray-600">Siswa tidak memiliki catatan indisipliner tahun ini.</td></tr>';
+                    } else {
+                        var htmlLog = '';
+                        for(var i=0; i<res.logDetail.length; i++) {
+                            var log = res.logDetail[i];
+                            var c = 'text-gray-600';
+                            if(log.status.toLowerCase().indexOf('lambat') > -1) c = 'text-amber-600 font-bold';
+                            else if(log.status.toLowerCase().indexOf('izin') > -1) c = 'text-orange-600 font-bold';
+                            else if(log.status.toLowerCase().indexOf('sakit') > -1) c = 'text-brand-600 font-bold';
+                            else if(log.status.toLowerCase().indexOf('alpa') > -1) c = 'text-rose-600 font-bold';
+
+                            htmlLog += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">' +
+                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600">' + (i+1) + '</td>' +
+                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 whitespace-nowrap">' + log.tanggal + '</td>' +
+                                        '<td class="p-2 text-center border border-gray-200 dark:border-gray-600 ' + c + '">' + log.status + '</td>' +
+                                        '<td class="p-2 border border-gray-200 dark:border-gray-600 text-xs">' + log.ket + '</td>' +
+                                       '</tr>';
+                        }
+                        tbodyLog.innerHTML = htmlLog;
+                    }
+                }
+            }, function(err) {
+                btn.innerHTML = 'Tampilkan'; btn.disabled = false;
+                Swal.fire('Error', String(err), 'error');
+            });
+        }
+
+        function submitRekap() {
+            var bulan = parseInt(document.getElementById('filter-bulan').value);
+            var tahun = parseInt(document.getElementById('filter-tahun').value);
+            var kelas = document.getElementById('filter-kelas').value;
+            var btn = document.getElementById('btn-submit-rekap');
+            var wrapHighlight = document.getElementById('rekap-highlight');
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading';
+            btn.disabled = true;
+            wrapHighlight.classList.add('hidden'); 
+
+            var tbodyBulan = document.getElementById('tbody-rekap-bulanan');
+            var tbodyTahun = document.getElementById('tbody-rekap-tahunan');
+            tbodyBulan.innerHTML = '<tr><td colspan="40" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengambil data dari server...</td></tr>';
+            tbodyTahun.innerHTML = '<tr><td colspan="19" class="p-8 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Mengambil data dari server...</td></tr>';
+
+            Server.panggil('getRekapBulanan', [bulan, tahun, kelas], function(data) {
+                btn.innerHTML = 'Tampilkan'; btn.disabled = false;
+                
+                var namaBulanTxt = getNamaBulan(bulan);
+                document.getElementById('print-subtitle').innerText = "Periode: " + namaBulanTxt + " " + tahun + " | Kelas: " + (kelas === 'Semua' ? 'Semua Kelas' : kelas);
+                document.getElementById('print-subtitle-tahunan').innerText = "Tahun: " + tahun + " | Kelas: " + (kelas === 'Semua' ? 'Semua Kelas' : kelas);
+                
+                buildRekapTable(data, bulan, tahun);
+            }, function(err) {
+                btn.innerHTML = 'Tampilkan'; btn.disabled = false;
+                tbodyBulan.innerHTML = '<tr><td colspan="40" class="p-8 text-center text-rose-500">Error: ' + err + '</td></tr>';
+                tbodyTahun.innerHTML = '<tr><td colspan="19" class="p-8 text-center text-rose-500">Error: ' + err + '</td></tr>';
+            });
+        }
+
+        function buildRekapTable(data, bulan, tahun) {
+            var daysInMonth = new Date(tahun, bulan, 0).getDate();
+            var theadBulan = document.getElementById('thead-rekap-bulanan');
+            var tbodyBulan = document.getElementById('tbody-rekap-bulanan');
+            var theadTahun = document.getElementById('thead-rekap-tahunan');
+            var tbodyTahun = document.getElementById('tbody-rekap-tahunan');
+            var wrapHighlight = document.getElementById('rekap-highlight');
+            var namaBulanTerpilih = getNamaBulan(bulan);
+
+            var thBulanHTML = '<tr><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 min-w-[30px] sticky left-0 top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[1px_0_0_#e2e8f0] text-[11px]">No</th><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 text-left min-w-[150px] sticky left-[30px] top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-[11px]">Nama Siswa</th><th colspan="' + daysInMonth + '" class="border border-gray-200 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 text-[11px]">' + namaBulanTerpilih + ' ' + tahun + '</th><th colspan="5" class="border border-gray-200 dark:border-gray-600 p-2 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 text-[11px]">Total Bulan Ini</th></tr><tr>';
+
+            for (var i = 1; i <= daysInMonth; i++) {
+                var dateObj = new Date(tahun, bulan - 1, i);
+                var isHoliday = dateObj.getDay() === 5; 
+                var bgClass = isHoliday ? 'bg-red-100 dark:bg-red-900/60 text-red-600' : 'bg-white dark:bg-gray-800';
+                thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 w-6 min-w-[20px] ' + bgClass + ' sticky top-[33px] z-20 text-[10px]">' + i + '</th>';
+            }
+            
+            var rCols = ['H', 'TL', 'I', 'S', 'A'];
+            for(var c=0; c<5; c++) thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 min-w-[25px] bg-brand-50 dark:bg-brand-900/40 text-[10px] sticky top-[33px] z-20">' + rCols[c] + '</th>';
+            thBulanHTML += '</tr>';
+            theadBulan.innerHTML = thBulanHTML;
+
+            var thTahunHTML = '<tr><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 min-w-[30px] sticky left-0 top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[1px_0_0_#e2e8f0] text-[11px]">No</th><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 text-left min-w-[150px] sticky left-[30px] top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-[11px]">Nama Siswa</th><th colspan="12" class="border border-gray-200 dark:border-gray-600 p-2 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 text-[11px]">Rekap Per Bulan (Tahun ' + tahun + ')</th><th colspan="5" class="border border-gray-200 dark:border-gray-600 p-2 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 text-[11px]">Total ' + tahun + '</th></tr><tr>';
+            var bulanSingkat = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
+            for(var m=0; m<12; m++) thTahunHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 w-12 text-[10px] sticky top-[33px] z-20">' + bulanSingkat[m] + '</th>';
+            var colsFull = ['Hadir', 'Lambat', 'Izin', 'Sakit', 'Alpa'];
+            for(var c=0; c<5; c++) thTahunHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 w-12 text-[10px] sticky top-[33px] z-20">' + colsFull[c] + '</th>';
+            thTahunHTML += '</tr>';
+            theadTahun.innerHTML = thTahunHTML;
+
+            if (!data || data.length === 0) {
+                tbodyBulan.innerHTML = '<tr><td colspan="' + (daysInMonth + 7) + '" class="p-8 text-center text-gray-400">Tidak ada data untuk filter tersebut.</td></tr>';
+                tbodyTahun.innerHTML = '<tr><td colspan="19" class="p-8 text-center text-gray-400">Tidak ada data untuk filter tersebut.</td></tr>';
+                return;
+            }
+
+            var trBulanHTML = '';
+            var trTahunHTML = '';
+            var maxHBulan = -1, terajinBulan = '-', valBulan = 0;
+            var maxHTahun = -1, terajinTahun = '-', valTahun = 0;
+
+            for (var j = 0; j < data.length; j++) {
+                var row = data[j];
+                
+                if (row.statBulan.H > maxHBulan) { maxHBulan = row.statBulan.H; terajinBulan = row.nama; valBulan = row.statBulan.H; }
+                if (row.statTahun.H > maxHTahun) { maxHTahun = row.statTahun.H; terajinTahun = row.nama; valTahun = row.statTahun.H; }
+
+                trBulanHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[1px_0_0_#e2e8f0] dark:shadow-[1px_0_0_#334155]">' + (j + 1) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] truncate max-w-[150px] text-[10px] md:text-xs">' + row.nama + '</td>';
+
+                for (var d = 1; d <= daysInMonth; d++) {
+                    var status = row.absensi[d];
+                    var cellTeks = ''; var cellBg = '';
+                    var dateObj = new Date(tahun, bulan - 1, d);
+                    var isHoliday = dateObj.getDay() === 5; 
+
+                    if (status) {
+                        var st = String(status).toLowerCase().trim();
+                        if (st.indexOf('hadir') > -1 || st.indexOf('tepat waktu') > -1) { cellTeks = 'v'; cellBg = 'bg-[#c6f6d5] text-[#22543d] dark:bg-emerald-900/40 dark:text-emerald-300'; } 
+                        else if (st.indexOf('terlambat') > -1) { cellTeks = 'TL'; cellBg = 'bg-[#fef08a] text-[#854d0e] dark:bg-amber-900/40 dark:text-amber-300'; } 
+                        else if (st.indexOf('izin') > -1) { cellTeks = 'I'; cellBg = 'bg-[#fed7d7] text-[#822727] dark:bg-orange-900/40 dark:text-orange-300'; }
+                        else if (st.indexOf('sakit') > -1) { cellTeks = 'S'; cellBg = 'bg-[#bfdbfe] text-[#1e3a8a] dark:bg-brand-900/40 dark:text-brand-300'; }
+                        else if (st.indexOf('alpa') > -1) { cellTeks = 'A'; cellBg = 'bg-[#fecdd3] text-[#be123c] dark:bg-rose-900/40 dark:text-rose-300'; }
+                        else { cellTeks = '?'; cellBg = 'bg-gray-100 text-gray-500'; }
+                    } else {
+                        if (isHoliday) cellBg = 'bg-red-50 dark:bg-red-900/20 text-red-400';
+                        else cellBg = 'bg-transparent dark:bg-gray-800';
+                    }
+                    trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 ' + cellBg + ' font-bold text-[9px] sm:text-xs text-center">' + cellTeks + '</td>';
+                }
+                
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-brand-700 bg-brand-50/50 dark:bg-brand-900/20 dark:text-brand-400">' + (row.statBulan.H || 0) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-amber-700 bg-amber-50/50 dark:bg-amber-900/20 dark:text-amber-400">' + (row.statBulan.TL || 0) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-orange-700 bg-orange-50/50 dark:bg-orange-900/20 dark:text-orange-400">' + (row.statBulan.I || 0) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-brand-700 bg-brand-50/50 dark:bg-brand-900/20 dark:text-brand-400">' + (row.statBulan.S || 0) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-rose-700 bg-rose-50/50 dark:bg-rose-900/20 dark:text-rose-400">' + (row.statBulan.A || 0) + '</td>';
+                trBulanHTML += '</tr>';
+
+                trTahunHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 z-10">' + (j + 1) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 z-10 truncate max-w-[150px] text-[10px] md:text-xs">' + row.nama + '</td>';
+                
+                for(var m=1; m<=12; m++) {
+                    var statM = row.statPerBulan[m];
+                    var cellIsi = '';
+                    if(statM && (statM.H>0 || statM.TL>0 || statM.I>0 || statM.S>0 || statM.A>0)) {
+                        cellIsi += '<div class="flex flex-col text-[7px] md:text-[9px] leading-tight text-left pl-1">';
+                        if(statM.H > 0) cellIsi += '<span class="text-emerald-600 font-bold">H:' + statM.H + '</span>';
+                        if(statM.TL > 0) cellIsi += '<span class="text-amber-500 font-bold">TL:' + statM.TL + '</span>';
+                        if(statM.I > 0) cellIsi += '<span class="text-orange-600 font-bold">I:' + statM.I + '</span>';
+                        if(statM.S > 0) cellIsi += '<span class="text-brand-500 font-bold">S:' + statM.S + '</span>';
+                        if(statM.A > 0) cellIsi += '<span class="text-rose-600 font-bold">A:' + statM.A + '</span>';
+                        cellIsi += '</div>';
+                    } else { cellIsi = '<span class="text-gray-300">-</span>'; }
+                    trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 align-top bg-white dark:bg-gray-800">' + cellIsi + '</td>';
+                }
+                
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/20 dark:text-emerald-400">' + (row.statTahun.H || 0) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-amber-700 bg-amber-50/50 dark:bg-amber-900/20 dark:text-amber-400">' + (row.statTahun.TL || 0) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-orange-700 bg-orange-50/50 dark:bg-orange-900/20 dark:text-orange-400">' + (row.statTahun.I || 0) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-brand-700 bg-brand-50/50 dark:bg-brand-900/20 dark:text-brand-400">' + (row.statTahun.S || 0) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-rose-700 bg-rose-50/50 dark:bg-rose-900/20 dark:text-rose-400">' + (row.statTahun.A || 0) + '</td>';
+                trTahunHTML += '</tr>';
+            }
+
+            if (data.length > 0 && (maxHBulan > 0 || maxHTahun > 0)) {
+                wrapHighlight.classList.remove('hidden');
+                document.getElementById('terajin-bulan').innerText = (maxHBulan > 0) ? terajinBulan : '-';
+                document.getElementById('stat-terajin-bulan').innerText = (maxHBulan > 0) ? (valBulan + ' Hari Hadir Tepat Waktu') : 'Belum ada data';
+                document.getElementById('terajin-tahun').innerText = (maxHTahun > 0) ? terajinTahun : '-';
+                document.getElementById('stat-terajin-tahun').innerText = (maxHTahun > 0) ? (valTahun + ' Hari Hadir Tepat Waktu') : 'Belum ada data';
+            } else wrapHighlight.classList.add('hidden');
+            
+            tbodyBulan.innerHTML = trBulanHTML;
+            tbodyTahun.innerHTML = trTahunHTML;
+        }
+
+        // ================= KUMPULAN PENGATURAN / SETUP =================
+        function muatPengaturanSistem(forceRefresh) {
+            var inputToken = document.getElementById('setup-fonnte-token');
+            var inputTemplate = document.getElementById('setup-wa-template');
+            var inputBatasMulai = document.getElementById('setup-batas-mulai');
+            var inputBatas = document.getElementById('setup-batas-waktu');
+            var inputKota = document.getElementById('setup-kota');
+            
+            var dispBatasMulai = document.getElementById('display-batas-mulai');
+            var dispBatas = document.getElementById('display-batas-waktu');
+
+            if (State.setupLoaded && !forceRefresh) return;
+
+            Server.panggil('getPengaturan', [], function(res) {
+                if (res) {
+                    State.setupLoaded = true;
+                    State.kota = res.kota || 'Surabaya';
+                    State.waliKelasData = res.waliKelasData || {};
+                    
+                    if(inputToken) inputToken.value = res.token || '';
+                    if(inputTemplate) inputTemplate.value = res.template || 'Pemberitahuan: Ananda [NAMA] telah tercatat kehadirannya pada [WAKTU] dengan status: [STATUS].';
+                    if(inputKota) inputKota.value = State.kota;
+
+                    var bm = res.batasMulai || '06:00';
+                    var bw = res.batasWaktu || '07:00';
+                    if(inputBatasMulai) inputBatasMulai.value = bm;
+                    if(inputBatas) inputBatas.value = bw;
+                    
+                    if(dispBatasMulai) dispBatasMulai.innerText = bm;
+                    if(dispBatas) dispBatas.innerText = bw;
+                    
+                    var kelasPilihan = document.getElementById('setup-kelas-wali');
+                    if (kelasPilihan && kelasPilihan.value) {
+                        document.getElementById('setup-wali').value = State.waliKelasData[kelasPilihan.value] || '';
+                    }
+                }
+            });
+        }
+
+        function simpanPengaturanSistem() {
+            var token = document.getElementById('setup-fonnte-token').value;
+            var template = document.getElementById('setup-wa-template').value;
+            var batasMulai = document.getElementById('setup-batas-mulai').value || '06:00';
+            var batas = document.getElementById('setup-batas-waktu').value || '07:00';
+            var kota = document.getElementById('setup-kota').value || 'Surabaya';
+            
+            Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
+            Server.panggil('simpanPengaturan', [{token: token, template: template, batasMulai: batasMulai, batasWaktu: batas, kota: kota, waliKelasData: State.waliKelasData}], function(res) {
+                if(res && res.status === 'success') {
+                    Swal.fire('Berhasil', res.message, 'success');
+                    var dispBatasMulai = document.getElementById('display-batas-mulai');
+                    var dispBatas = document.getElementById('display-batas-waktu');
+                    if(dispBatasMulai) dispBatasMulai.innerText = batasMulai;
+                    if(dispBatas) dispBatas.innerText = batas;
+                    
+                    muatPengaturanSistem(true); 
+                } else Swal.fire('Gagal', res ? res.message : 'Terjadi kesalahan', 'error');
+            }, function(err) { Swal.fire('Error', String(err), 'error'); });
+        }
+        
+        function ubahSetupKelasWali(el) {
+            var kls = el.value;
+            var inp = document.getElementById('setup-wali');
+            if(kls) {
+                inp.disabled = false;
+                inp.value = State.waliKelasData[kls] || '';
+                inp.classList.remove('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-300');
+                inp.classList.add('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
+            } else {
+                inp.disabled = true;
+                inp.value = '';
+                inp.classList.add('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-300');
+                inp.classList.remove('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
+            }
+        }
+
+        document.addEventListener('input', function(e) {
+             if (e.target.id === 'setup-wali') {
+                  var kls = document.getElementById('setup-kelas-wali').value;
+                  if(kls) State.waliKelasData[kls] = e.target.value;
+             }
+        });
+
+        // ================= INPUT IZIN & AKSI CEPAT =================
+        function prosesUbahKelasIzin(elemen) {
+            var kls = String(elemen.value).trim().toLowerCase();
+            var selSiswa = document.getElementById('i-nisn');
+            if(!selSiswa) return;
+            selSiswa.innerHTML = '<option value="">-- Pilih Siswa --</option>';
+            if (kls) {
+                selSiswa.disabled = false;
+                selSiswa.classList.remove('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-400');
+                selSiswa.classList.add('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
+                var count = 0;
+                for(var j=0; j<State.dataSiswaAbsen.length; j++) {
+                    if(String(State.dataSiswaAbsen[j].kelas).trim().toLowerCase() === kls) {
+                        selSiswa.innerHTML += '<option value="' + State.dataSiswaAbsen[j].nisn + '">' + State.dataSiswaAbsen[j].nama + '</option>'; count++;
+                    }
+                }
+                if (count === 0) selSiswa.innerHTML = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
+            } else {
+                selSiswa.disabled = true;
+                selSiswa.classList.add('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-400');
+                selSiswa.classList.remove('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
+                selSiswa.innerHTML = '<option value="">-- Pilih Kelas Dahulu --</option>';
+            }
+        }
+
+        function prosesUbahStatusIzin(elemen) {
+            var wrapKet = document.getElementById('wrap-ket'); var inputKet = document.getElementById('i-ket');
+            if(!wrapKet || !inputKet) return;
+            if (elemen.value === 'Alpa') { wrapKet.style.display = 'none'; inputKet.value = ''; } else wrapKet.style.display = 'block';
+        }
+
+        function modalInputIzin() {
+            Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+
+            Server.panggil('getDataSiswa', [], function(dataSiswa) {
+                State.dataSiswaAbsen = dataSiswa || [];
+                Server.panggil('getDaftarKelas', [], function(dataKelas) {
+                    var opKelas = '<option value="">-- Pilih Kelas --</option>';
+                    if(dataKelas) { for(var i=0; i<dataKelas.length; i++) opKelas += '<option value="' + dataKelas[i] + '">' + dataKelas[i] + '</option>'; }
+
+                    var isiHTML = '<div class="space-y-2 mt-1 text-left">' +
+                        '<div><label class="text-xs font-bold text-gray-200">Pilih Kelas</label><select id="i-kelas" data-action="ubahKelasIzin" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 mt-1 outline-none focus:border-brand-500 text-sm">' + opKelas + '</select></div>' +
+                        '<div><label class="text-xs font-bold text-gray-200">Pilih Siswa</label><select id="i-nisn" disabled class="w-full border border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-600 text-gray-500 dark:text-gray-400 rounded-lg p-2 mt-1 outline-none focus:border-brand-500 text-sm"><option value="">-- Pilih Kelas Dahulu --</option></select></div>' +
+                        '<div><label class="text-xs font-bold text-gray-200">Status Kehadiran</label><select id="i-status" data-action="ubahStatusIzin" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 mt-1 outline-none focus:border-brand-500 text-sm"><option value="Sakit">Sakit</option><option value="Izin">Izin</option><option value="Alpa">Alpa</option></select></div>' +
+                        '<div id="wrap-ket"><label class="text-xs font-bold text-gray-200">Keterangan</label><input type="text" id="i-ket" class="w-full border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-black dark:text-white rounded-lg p-2 mt-1 outline-none focus:border-brand-500 text-sm" placeholder="Keterangan opsional..."></div>' +
+                    '</div>';
+
+                    Swal.fire({
+                        title: '<h3 class="text-lg font-bold">Input Keterangan</h3>', html: isiHTML, showCancelButton: true, confirmButtonText: 'Simpan',
+                        background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937',
+                        preConfirm: function() {
+                            var kelas = document.getElementById('i-kelas').value; var nisn = document.getElementById('i-nisn').value;
+                            var status = document.getElementById('i-status').value; var ket = document.getElementById('i-ket').value;
+                            if (!kelas) { Swal.showValidationMessage('Pilih kelas terlebih dahulu!'); return false; }
+                            if (!nisn) { Swal.showValidationMessage('Pilih siswa yang akan diinput!'); return false; }
+                            if (!status) { Swal.showValidationMessage('Pilih status kehadiran!'); return false; }
+                            return { nisn: nisn, status: status, keterangan: ket };
+                        }
+                    }).then(function(h) {
+                        if (h.isConfirmed) {
+                            Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
+                            Server.panggil('inputIzinSiswa', [h.value], function(res) { 
+                                if(res && res.status === 'success') { Swal.fire('Berhasil', res.message, 'success'); muatDashboard(true); muatAbsenHariIni(true); } 
+                                else Swal.fire('Gagal', res ? res.message : 'Terjadi Kesalahan', 'error');
+                            }, function(err) { Swal.fire('Error', String(err), 'error'); });
+                        }
+                    });
+                }, function() { Swal.fire('Error', 'Gagal memuat kelas', 'error'); });
+            }, function() { Swal.fire('Error', 'Gagal memuat siswa', 'error'); });
+        }
+
+        // ================= KONTROL EVENT DOM GLOBAL =================
+        document.addEventListener('click', function(e) {
+            var printWrapper = e.target.closest('#wrap-btn-print');
+            var dropdownPrint = document.getElementById('dropdown-print');
+            if (!printWrapper && dropdownPrint && !dropdownPrint.classList.contains('hidden')) { dropdownPrint.classList.add('hidden'); }
+
+            var itemDropdown = e.target.closest('.dropdown-item');
+            if (itemDropdown) { pilihSiswaDropdown(itemDropdown.getAttribute('data-nisn')); return; }
+
+            var elemen = e.target.closest('[data-action]');
+            if (!elemen) return;
+            
+            var aksi = elemen.getAttribute('data-action');
+            if (aksi === 'gantiTema') gantiTema();
+            else if (aksi === 'keHalaman') keHalaman(elemen.getAttribute('data-target'));
+            else if (aksi === 'keTab') keTab(elemen.getAttribute('data-target'));
+            else if (aksi === 'bukaKamera') bukaKamera();
+            else if (aksi === 'bukaNFC') bukaNFC();
+            else if (aksi === 'kirimManual') kirimManual();
+            else if (aksi === 'prosesLogin') prosesLogin();
+            else if (aksi === 'keluarAdmin') keluarAdmin();
+            else if (aksi === 'tindakHapusMasal') tindakHapusMasal();
+            else if (aksi === 'tambahSiswa') tambahSiswa();
+            else if (aksi === 'switchModeRekap') switchModeRekap(elemen.getAttribute('data-mode'));
+            else if (aksi === 'submitRekap') submitRekap();
+            else if (aksi === 'submitRekapIndividu') submitRekapIndividu();
+            else if (aksi === 'togglePrint') { if (dropdownPrint) dropdownPrint.classList.toggle('hidden'); }
+            else if (aksi === 'cetakPDF') {
+                if (dropdownPrint) dropdownPrint.classList.add('hidden');
+                jalankanCetakPDF(elemen.getAttribute('data-mode'));
+            }
+            else if (aksi === 'tambahKelas') tambahKelas();
+            else if (aksi === 'modalInputIzin') modalInputIzin();
+            else if (aksi === 'simpanPengaturanSistem') simpanPengaturanSistem();
+            else if (aksi === 'tambahAdmin') { if(typeof Swal !== 'undefined') Swal.fire('Info', 'Tambahkan Admin di Google Sheets.', 'info'); else alert('Info: Tambahkan di Google Sheets'); }
+            else if (aksi === 'bukaFolder') window.open('https://drive.google.com/drive/folders/1S_heRm5OpqRT3m3P3khPGPOTVFFzBtYP', '_blank');
+            else if (aksi === 'editSiswa') editSiswa(elemen.getAttribute('data-idx'));
+            else if (aksi === 'hapusSiswaPribadi') hapusSiswaPribadi(elemen.getAttribute('data-nisn'), elemen.getAttribute('data-nama'));
+            else if (aksi === 'prevSiswa') prevSiswa();
+            else if (aksi === 'nextSiswa') nextSiswa();
+        });
+
+        document.addEventListener('change', function(e) {
+            var elemen = e.target.closest('[data-action]');
+            if (!elemen) return;
+            var aksi = elemen.getAttribute('data-action');
+            
+            if (aksi === 'centangSemua') centangSemua(elemen);
+            else if (aksi === 'periksaCentang') periksaCentang();
+            else if (aksi === 'ubahKelasIzin') prosesUbahKelasIzin(elemen);
+            else if (aksi === 'ubahStatusIzin') prosesUbahStatusIzin(elemen);
+            else if (aksi === 'ubahTahunDashboard') muatDashboard(true, elemen.value);
+            else if (aksi === 'ubahKelasIndividu') muatDataSiswaUntukIndividu(elemen.value);
+            else if (aksi === 'ubahSetupKelasWali') ubahSetupKelasWali(elemen);
+        });
+
+        window.addEventListener('DOMContentLoaded', function() {
+            if (typeof Swal === 'undefined') { window.Swal = { fire: function(a,b) { alert(a+"\n"+(b||"")); return Promise.resolve({isConfirmed:true, value:true}); }, showLoading: function(){}, showValidationMessage: function(msg) { alert(msg); } }; }
+            aturTemaAwal(); initFilterRekap();
+            setTimeout(function() { muatAbsenHariIni(true); muatDataSiswaDropdown(); setupDropdownEvent(); }, 500);
+        });
+    </script>
 </body>
 </html>
