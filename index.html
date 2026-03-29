@@ -173,6 +173,7 @@
         </section>
 
         <section id="view-login" class="view-section w-full max-w-md mx-auto">
+            <!-- Login -->
             <div class="glass-card rounded-2xl p-8 w-full mt-4 shadow-lg">
                 <div class="text-center mb-8">
                     <div class="w-20 h-20 bg-gradient-to-tr from-brand-100 to-white dark:from-gray-700 dark:to-gray-800 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-700 dark:text-brand-400 shadow-sm border border-brand-50 dark:border-gray-600"><i class="fa-solid fa-user-shield text-3xl"></i></div>
@@ -206,6 +207,7 @@
             </div>
 
             <div id="tab-dashboard" class="tab-content active w-full">
+                <!-- Dashboard Content -->
                 <div class="flex justify-between items-center mb-6 mt-2">
                     <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i> Dashboard</h3>
                     <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm relative z-30 smooth-hover">
@@ -287,6 +289,7 @@
             </div>
 
             <div id="tab-siswa" class="tab-content w-full">
+                <!-- Siswa Content -->
                 <div class="glass-card rounded-2xl p-6 mb-4 shadow-sm">
                     <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-4">
                         <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-users mr-2 text-brand-500"></i>Data Master Siswa</h3>
@@ -315,7 +318,7 @@
             </div>
 
             <div id="tab-rekap" class="tab-content w-full">
-                
+                <!-- Rekap Content -->
                 <div class="flex space-x-2 mb-4 print:hidden bg-gray-100 dark:bg-gray-800 p-1.5 rounded-xl w-fit border border-gray-200 dark:border-gray-700">
                     <button type="button" data-action="switchModeRekap" data-mode="kelas" id="btn-mode-kelas" class="px-4 py-2 text-xs font-bold rounded-lg bg-white dark:bg-gray-600 text-brand-700 dark:text-brand-300 shadow-sm transition-all pointer-events-none">Rekap Kelas</button>
                     <button type="button" data-action="switchModeRekap" data-mode="individu" id="btn-mode-individu" class="px-4 py-2 text-xs font-bold rounded-lg text-gray-500 hover:bg-gray-200 dark:hover:bg-gray-700 transition-all smooth-hover">Rekap Individu (Per Siswa)</button>
@@ -467,6 +470,7 @@
             </div>
 
             <div id="tab-setup" class="tab-content w-full">
+                <!-- Setup Content -->
                 <div class="glass-card rounded-2xl p-8 mb-4 max-w-3xl mx-auto shadow-lg">
                     <div class="text-center border-b border-gray-200 dark:border-gray-700 pb-6 mb-6">
                         <div class="w-16 h-16 rounded-full bg-brand-50 dark:bg-gray-800 flex items-center justify-center mx-auto mb-4 text-brand-600 text-2xl shadow-inner border border-brand-100 dark:border-gray-700"><i class="fa-solid fa-gears"></i></div>
@@ -567,6 +571,11 @@
     </main>
 
     <script>
+        // =========================================================================
+        // URL WEB APP GOOGLE APPS SCRIPT ANDA SUDAH DI-INJECT DI SINI
+        // =========================================================================
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxON_GElWFRNw2h3yGETbG8hBfmolQ4H3b4zNgoroxbH_2kur_-Qz01gR_s1f8u_Bsf/exec"; 
+
         // ================= KUMPULAN FUNGSI UTILITAS & API =================
         var State = {
             kamera: null, kameraAktif: false, nfcController: null,
@@ -606,65 +615,51 @@
             }
         };
 
-        // ==========================================================
-        // MASUKKAN URL WEB APP GOOGLE APPS SCRIPT ANDA DI SINI
-        // ==========================================================
-        var GAS_API_URL = "https://script.google.com/macros/s/AKfycbyO3o5Y6oBgWclTmwNgwnKzkg72Ea65bb7IvU0TmkeVuz2LV_ToQerz7qXXEfMjSwBtqA/exec"; 
-
+        // --- KOMUNIKASI FETCH API KE GOOGLE APPS SCRIPT ---
         var Server = {
             panggil: function(namaFungsi, args, sukses, gagal) {
-                // Mengecek apakah URL API sudah diisi
-                if (GAS_API_URL && GAS_API_URL !== "URL_WEB_APP_ANDA_DISINI" && GAS_API_URL !== "") {
-                    
-                    fetch(GAS_API_URL, {
+                if (GAS_WEB_APP_URL && GAS_WEB_APP_URL.startsWith("http")) {
+                    fetch(GAS_WEB_APP_URL, {
+                        redirect: "follow", 
                         method: 'POST',
-                        // Harus text/plain agar tidak diblokir oleh sistem CORS Google
-                        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                        body: JSON.stringify({ action: namaFungsi, args: args || [] }),
-                        redirect: 'follow' 
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8",
+                        },
+                        body: JSON.stringify({ action: namaFungsi, args: args })
                     })
-                    .then(function(response) {
-                        return response.json();
+                    .then(response => {
+                        if (!response.ok) throw new Error("HTTP error " + response.status);
+                        return response.text();
                     })
-                    .then(function(res) {
+                    .then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            console.error("Format balasan invalid:", text);
+                            throw new Error("Format JSON gagal diparsing. Pastikan Deployment diset ke 'Anyone'!");
+                        }
+                    })
+                    .then(res => {
                         if (res.status === 'success') {
                             if (sukses) sukses(res.data);
                         } else {
                             if (gagal) gagal(res.message);
+                            else Swal.fire('Error', res.message, 'error');
                         }
                     })
-                    .catch(function(err) {
-                        if (gagal) gagal("Error koneksi server API: " + err.message);
-                        console.error("API Fetch Error:", err);
+                    .catch(err => {
+                        console.error("Fetch API Error:", err);
+                        let errMsg = String(err);
+                        if (errMsg.includes('Failed to fetch') || errMsg.includes('NetworkError')) {
+                            errMsg = "Koneksi ke server Gagal. Pastikan Anda telah Deploy ulang Google Apps Script dengan opsi 'Who has access: Anyone' (Siapa saja)!";
+                        }
+                        if (gagal) gagal(errMsg);
+                        else Swal.fire('Koneksi Error', errMsg, 'error');
                     });
-
-                } else if (typeof google !== 'undefined' && google.script && google.script.run) {
-                    // Fallback jika dibuka langsung dari AppScript (URL script.google.com/...)
-                    var exec = google.script.run;
-                    if (sukses) exec = exec.withSuccessHandler(sukses);
-                    if (gagal) exec = exec.withFailureHandler(gagal);
-                    try {
-                        if (namaFungsi === 'loginAdmin') exec.loginAdmin(args[0]);
-                        else if (namaFungsi === 'catatAbsensi') exec.catatAbsensi(args[0]);
-                        else if (namaFungsi === 'getRekapData') exec.getRekapData();
-                        else if (namaFungsi === 'getDashboardData') exec.getDashboardData(args[0]);
-                        else if (namaFungsi === 'getDataSiswa') exec.getDataSiswa();
-                        else if (namaFungsi === 'getDaftarKelas') exec.getDaftarKelas();
-                        else if (namaFungsi === 'tambahKelas') exec.tambahKelas(args[0]);
-                        else if (namaFungsi === 'tambahSiswa') exec.tambahSiswa(args[0]);
-                        else if (namaFungsi === 'editSiswa') exec.editSiswa(args[0]);
-                        else if (namaFungsi === 'hapusSiswa') exec.hapusSiswa(args[0]);
-                        else if (namaFungsi === 'hapusBanyakSiswa') exec.hapusBanyakSiswa(args[0]);
-                        else if (namaFungsi === 'inputIzinSiswa') exec.inputIzinSiswa(args[0]);
-                        else if (namaFungsi === 'getPengaturan') exec.getPengaturan();
-                        else if (namaFungsi === 'simpanPengaturan') exec.simpanPengaturan(args[0]);
-                        else if (namaFungsi === 'getRekapBulanan') exec.getRekapBulanan(args[0], args[1], args[2]);
-                        else if (namaFungsi === 'getRekapIndividu') exec.getRekapIndividu(args[0], args[1]);
-                    } catch(err) { if (gagal) gagal(String(err)); }
-                } else {
-                    // Mencegah error jika URL belum diisi saat dibuka di localhost / Vercel
-                    if (gagal) gagal("URL GAS_API_URL di dalam file index.html belum diisi! Silakan lengkapi terlebih dahulu.");
-                    console.error("URL GAS_API_URL belum diisi!");
+                } 
+                else {
+                    // Dummy simulasi jika URL kosong (tidak diubah)
+                    setTimeout(function(){ if (sukses) sukses([]); }, 300);
                 }
             }
         };
@@ -758,13 +753,15 @@
             
             Server.panggil('loginAdmin', [niy], function(res) {
                 btn.innerHTML = teksAsli; btn.disabled = false;
-                if (res && res.status === 'success') {
+                if (res && (res.status === 'success' || res.nama)) {
                     document.getElementById('input-niy').value = '';
-                    document.getElementById('admin-name').innerText = 'Admin: ' + res.nama;
-                    var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama;
+                    document.getElementById('admin-name').innerText = 'Admin: ' + (res.nama || 'Utama');
+                    var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama || 'Utama';
                     var infoMob = document.getElementById('mobile-admin-info'); if (infoMob) { infoMob.classList.remove('hidden'); infoMob.classList.add('block'); }
                     keHalaman('view-admin'); keTab('tab-dashboard'); muatPengaturanSistem(true); 
-                } else Swal.fire('Gagal', res ? res.message : 'NIY Salah', 'error');
+                } else {
+                    Swal.fire('Gagal', typeof res === 'string' ? res : (res.message || 'NIY Salah'), 'error');
+                }
             }, function(err) { btn.innerHTML = teksAsli; btn.disabled = false; Swal.fire('Error', String(err), 'error'); });
         }
 
@@ -786,7 +783,7 @@
             document.getElementById('scanner-placeholder').style.display = 'none'; 
             State.kamera = new Html5Qrcode("reader");
             State.kamera.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
-                function(teks) { matikanScanner(); kirimAbsen(teks); }, function(err) {}
+                function(teks) { matikanScanner(); kirimAbsen(teks, true); }, function(err) {}
             ).then(function() { State.kameraAktif = true; }).catch(function(e) {
                 document.getElementById('scanner-placeholder').style.display = 'flex'; 
                 Swal.fire('Kamera Error', 'Mohon izinkan akses kamera di browser Anda', 'error');
@@ -823,7 +820,7 @@
                     matikanNFC();
                     Swal.close();
                     const uid = event.serialNumber.replace(/:/g, '').toUpperCase();
-                    kirimAbsen(uid);
+                    kirimAbsen(uid, false);
                 };
                 ndef.onreadingerror = () => {
                     Swal.fire('Error', 'Gagal membaca kartu. Coba tempelkan lagi.', 'error');
@@ -866,21 +863,28 @@
             var n = document.getElementById('input-nisn').value;
             if (!n) return Swal.fire('Peringatan', 'Masukkan NISN', 'warning');
             var drop = document.getElementById('dropdown-siswa'); if(drop) drop.classList.add('hidden');
-            kirimAbsen(n); document.getElementById('input-nisn').value = '';
+            kirimAbsen(n, false); document.getElementById('input-nisn').value = '';
         }
 
-        function kirimAbsen(nisn) {
+        function kirimAbsen(nisn, dariKamera) {
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
             Server.panggil('catatAbsensi', [nisn], function(res) {
-                if(res && res.status === 'success') {
-                    Swal.fire({ icon: 'success', title: 'Tercatat!', text: res.message, timer: 2000, showConfirmButton: false });
-                    setTimeout(function() { bukaKamera(); }, 2500); muatAbsenHariIni(true);
-                } else Swal.fire('Gagal', res ? res.message : 'Siswa tidak ditemukan/Sudah Absen', 'error');
-            }, function(err) { Swal.fire('Error', String(err), 'error'); });
+                if(res && (res.status === 'success' || res.message)) {
+                    Swal.fire({ icon: 'success', title: 'Tercatat!', text: res.message || res, timer: 2000, showConfirmButton: false });
+                    if (dariKamera) {
+                        setTimeout(function() { bukaKamera(); }, 2500); 
+                    }
+                    muatAbsenHariIni(true);
+                } else Swal.fire('Gagal', res ? (res.message || res) : 'Siswa tidak ditemukan/Sudah Absen', 'error');
+            }, function(err) { Swal.fire('Gagal/Error', String(err), 'error'); });
         }
 
         function muatDataSiswaDropdown() {
-            Server.panggil('getDataSiswa', [], function(data) { State.dataSiswaAbsen = data || []; }, function(err) { console.error(err); });
+            Server.panggil('getDataSiswa', [], function(data) { 
+                State.dataSiswaAbsen = data || []; 
+            }, function(err) { 
+                console.error("Dropdown Error:", err); 
+            });
         }
 
         function renderDropdownSiswa(kataKunci) {
@@ -943,6 +947,8 @@
                             '</li>';
                 }
                 list.innerHTML = isi;
+            }, function(err) {
+                if(list) list.innerHTML = '<li class="p-5 text-center text-rose-500 text-xs italic">Koneksi Error: ' + err + '</li>';
             });
         }
 
@@ -980,6 +986,8 @@
                     isi += '<li class="p-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"><div class="flex items-center space-x-4"><div class="h-10 w-10 rounded-full ' + bg + ' ' + color + ' flex items-center justify-center text-xs shadow-sm"><i class="fa-solid ' + icon + '"></i></div><div><p class="text-xs font-bold text-gray-800 dark:text-gray-200">' + r.nama + '</p><p class="text-[10px] text-gray-500">' + r.kelas + ' &bull; ' + r.waktu + '</p></div></div><div class="text-right"><span class="px-2.5 py-1 rounded border border-current text-[9px] font-bold uppercase ' + color + ' ' + bg + '">' + r.status + '</span></div></li>';
                 }
                 list.innerHTML = isi;
+            }, function(err){
+                list.innerHTML = '<li class="p-4 text-center text-rose-500 text-xs">Error memuat log.</li>';
             });
         }
 
@@ -1096,7 +1104,7 @@
             Swal.fire({ title: 'Kelas Baru', input: 'text', placeholder: 'Contoh: VII-C', showCancelButton: true, confirmButtonText: 'Simpan', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937' }).then(function(r) {
                 if(r.isConfirmed && r.value) {
                     Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
-                    Server.panggil('tambahKelas', [r.value], function(res) { Swal.fire('Berhasil', res.message, 'success'); });
+                    Server.panggil('tambahKelas', [r.value], function(res) { Swal.fire('Berhasil', res.message || res, 'success'); });
                 }
             });
         }
@@ -1121,7 +1129,7 @@
                     if (h.isConfirmed) {
                         matikanNFC();
                         Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
-                        Server.panggil('tambahSiswa', [h.value], function(res) { Swal.fire('Sukses', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
+                        Server.panggil('tambahSiswa', [h.value], function(res) { Swal.fire('Sukses', res.message || res, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
                     }
                 });
             });
@@ -1147,7 +1155,7 @@
                     if (h.isConfirmed) {
                         matikanNFC();
                         Swal.fire({title: 'Memperbarui...', didOpen: function() { Swal.showLoading(); }});
-                        Server.panggil('editSiswa', [h.value], function(res) { Swal.fire('Tersimpan', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
+                        Server.panggil('editSiswa', [h.value], function(res) { Swal.fire('Tersimpan', res.message || res, 'success'); muatSiswa(true); muatDataSiswaDropdown(); });
                     }
                 });
             });
@@ -1157,7 +1165,7 @@
             Swal.fire({ title: 'Hapus', html: 'Yakin menghapus <b>' + nama + '</b>?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya' }).then(function(r) { 
                 if (r.isConfirmed) { 
                     Swal.fire({title: 'Menghapus...', didOpen: function() { Swal.showLoading(); }});
-                    Server.panggil('hapusSiswa', [nisn], function(res) { Swal.fire('Dihapus', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
+                    Server.panggil('hapusSiswa', [nisn], function(res) { Swal.fire('Dihapus', res.message || res, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
                 } 
             });
         }
@@ -1169,7 +1177,7 @@
             Swal.fire({ title: 'Hapus ' + nArr.length + ' Siswa?', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya' }).then(function(r) { 
                 if (r.isConfirmed) { 
                     Swal.fire({title: 'Menghapus...', didOpen: function() { Swal.showLoading(); }});
-                    Server.panggil('hapusBanyakSiswa', [nArr], function(res) { Swal.fire('Dihapus', res.message, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
+                    Server.panggil('hapusBanyakSiswa', [nArr], function(res) { Swal.fire('Dihapus', res.message || res, 'success'); muatSiswa(true); muatDataSiswaDropdown(); }); 
                 } 
             });
         }
@@ -1184,7 +1192,7 @@
                 State.dataSiswa = data || [];
                 if (!State.siswaLoaded || forceRefresh) State.currentPageSiswa = 1;
                 State.siswaLoaded = true; renderTabelSiswa();
-            }, function(err) { if (!State.siswaLoaded) t.innerHTML = '<tr><td colspan="7" class="text-center text-rose-500 p-4">Error memuat data</td></tr>'; });
+            }, function(err) { if (!State.siswaLoaded) t.innerHTML = '<tr><td colspan="7" class="text-center text-rose-500 p-4">Error memuat data: ' + err + '</td></tr>'; });
         }
 
 
@@ -1219,7 +1227,7 @@
                     if (cbKelas) cbKelas.innerHTML = optSemua + optBody;
                     if (cbKelasInd) cbKelasInd.innerHTML = optPilih + optBody;
                     if (cbSetupWali) cbSetupWali.innerHTML = optPilih + optBody;
-                });
+                }, function(err) { console.error("Filter Kelas Error:", err); });
             }
         }
 
@@ -1636,6 +1644,9 @@
             var inpWal = document.getElementById('setup-wali');
             if (klsPil && klsPil.value && inpWal) {
                 inpWal.value = State.waliKelasData[klsPil.value] || '';
+                inpWal.disabled = false;
+                inpWal.classList.remove('bg-gray-100', 'dark:bg-gray-600', 'text-gray-500', 'dark:text-gray-300');
+                inpWal.classList.add('bg-white', 'dark:bg-gray-700', 'text-black', 'dark:text-white');
             }
 
             if (State.setupLoaded && !forceRefresh) return;
@@ -1713,8 +1724,8 @@
 
             Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
             Server.panggil('simpanPengaturan', [payload], function(res) {
-                if(res && res.status === 'success') {
-                    Swal.fire('Berhasil', res.message, 'success');
+                if(res && (res.status === 'success' || res.message)) {
+                    Swal.fire('Berhasil', res.message || res, 'success');
                     var dispBatasMulai = document.getElementById('display-batas-mulai');
                     var dispBatas = document.getElementById('display-batas-waktu');
                     var dispBatasAkhir = document.getElementById('display-batas-akhir');
@@ -1723,7 +1734,7 @@
                     if(dispBatasAkhir) dispBatasAkhir.innerText = batasAkhir;
                     
                     muatPengaturanSistem(true); 
-                } else Swal.fire('Gagal', res ? res.message : 'Terjadi kesalahan', 'error');
+                } else Swal.fire('Gagal', res ? (res.message || res) : 'Terjadi kesalahan', 'error');
             }, function(err) { Swal.fire('Error', String(err), 'error'); });
         }
 
@@ -1816,8 +1827,8 @@
                         if (h.isConfirmed) {
                             Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
                             Server.panggil('inputIzinSiswa', [h.value], function(res) { 
-                                if(res && res.status === 'success') { Swal.fire('Berhasil', res.message, 'success'); muatDashboard(true); muatAbsenHariIni(true); } 
-                                else Swal.fire('Gagal', res ? res.message : 'Terjadi Kesalahan', 'error');
+                                if(res && (res.status === 'success' || res.message)) { Swal.fire('Berhasil', res.message || res, 'success'); muatDashboard(true); muatAbsenHariIni(true); } 
+                                else Swal.fire('Gagal', res ? (res.message || res) : 'Terjadi Kesalahan', 'error');
                             }, function(err) { Swal.fire('Error', String(err), 'error'); });
                         }
                     });
