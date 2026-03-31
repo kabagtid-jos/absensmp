@@ -567,7 +567,8 @@
                             </div>
                         </div>
 
-                        <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <!-- ID 'setup-wa-section' dan class 'hidden' ditambahkan di baris bawah ini -->
+                        <div id="setup-wa-section" class="bg-white dark:bg-gray-800 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 shadow-sm hidden">
                             <h4 class="font-bold text-gray-800 dark:text-white mb-4 text-sm flex items-center"><i class="fa-brands fa-whatsapp text-emerald-500 mr-2.5 text-lg"></i> Integrasi API WhatsApp</h4>
                             <div class="space-y-4">
                                 <div>
@@ -616,6 +617,7 @@
             currentPageSiswa: 1, itemsPerPageSiswa: 10,
             dataLogIndividu: [], currentPageLogIndividu: 1, itemsPerPageLogIndividu: 12,
             siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false, rekapLoaded: false,
+            roleAdmin: '', // Variabel baru untuk menampung hak akses
             waliKelasData: {},
             daftarKelas: [] // Tambahan state cache untuk Daftar Kelas
         };
@@ -815,8 +817,17 @@
                     var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama || 'Admin';
                     
                     var roleVal = res.role || 'Panel Admin';
+                    State.roleAdmin = roleVal; // Simpan role ke memori State
+                    
                     var roleMob = document.getElementById('admin-role-mobile'); if (roleMob) roleMob.innerText = roleVal;
                     var roleDesk = document.getElementById('admin-role'); if (roleDesk) roleDesk.innerText = roleVal;
+
+                    // Logika untuk menyembunyikan/menampilkan fitur API WA
+                    var waSection = document.getElementById('setup-wa-section');
+                    if (waSection) {
+                        if (roleVal.toLowerCase() === 'super admin') waSection.classList.remove('hidden');
+                        else waSection.classList.add('hidden');
+                    }
 
                     var infoMob = document.getElementById('mobile-admin-info'); if (infoMob) { infoMob.classList.remove('hidden'); infoMob.classList.add('block'); }
                     keHalaman('view-admin'); keTab('tab-dashboard'); muatPengaturanSistem(true); 
@@ -829,7 +840,7 @@
         function keluarAdmin() {
             var infoMob = document.getElementById('mobile-admin-info');
             if (infoMob) { infoMob.classList.add('hidden'); infoMob.classList.remove('block'); }
-            State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false; State.rekapLoaded = false;
+            State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false; State.rekapLoaded = false; State.roleAdmin = '';
             
             var inpWali = document.getElementById('setup-wali');
             if (inpWali) { inpWali.value = ''; inpWali.disabled = true; }
