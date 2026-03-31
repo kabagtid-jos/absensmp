@@ -44,6 +44,13 @@
         .view-section { display: none; opacity: 0; } .view-section.active { display: block; opacity: 1; animation: fadeInUp 0.5s forwards; }
         .tab-content { display: none; } .tab-content.active { display: block; animation: fadeInUp 0.5s forwards; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Splash Screen Animasi */
+        #splash-screen { position: fixed; inset: 0; z-index: 999999; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; transition: opacity 0.6s ease, visibility 0.6s ease; }
+        .dark #splash-screen { background: #0f172a; }
+        .splash-logo { width: 110px; height: 110px; border-radius: 50%; object-fit: cover; animation: splashPulse 2s infinite ease-in-out; box-shadow: 0 10px 25px -5px rgba(14,165,233,0.5); border: 4px solid #0ea5e9; }
+        @keyframes splashPulse { 0%, 100% { transform: scale(1) translateY(0); } 50% { transform: scale(1.05) translateY(-10px); } }
+
         .glass-card { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.7); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); }
         .dark .glass-card { background: rgba(30, 41, 59, 0.85); border: 1px solid rgba(51, 65, 85, 0.5); color: #f1f5f9; }
         .smooth-hover { transition: all 0.3s; } .smooth-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
@@ -120,6 +127,17 @@
     </style>
 </head>
 <body class="text-gray-800 antialiased min-h-screen flex flex-col bg-animated dark:bg-dark-bg">
+
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="https://i.ibb.co.com/VY4pcndf/age.png" alt="Logo" class="splash-logo mb-5">
+        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-brand-800 to-brand-500 dark:from-brand-400 dark:to-brand-200 tracking-widest uppercase">Abzensi</h2>
+        <div class="mt-6 flex space-x-2">
+            <div class="w-2.5 h-2.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+            <div class="w-2.5 h-2.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+            <div class="w-2.5 h-2.5 bg-brand-500 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
+        </div>
+    </div>
 
     <noscript><div style="background: red; color: white; padding: 20px; text-align: center; font-weight: bold; z-index: 9999; position: relative;">JAVASCRIPT DIBLOKIR. Harap aktifkan Javascript di browser Anda.</div></noscript>
 
@@ -1910,6 +1928,16 @@
             if (typeof Swal === 'undefined') { window.Swal = { fire: function(a,b) { alert(a+"\n"+(b||"")); return Promise.resolve({isConfirmed:true, value:true}); }, showLoading: function(){}, showValidationMessage: function(msg) { alert(msg); } }; }
             aturTemaAwal(); initFilterRekap();
             setTimeout(function() { muatAbsenHariIni(true); muatDataSiswaDropdown(); setupDropdownEvent(); }, 500);
+
+            // Menghilangkan Splash Screen dengan transisi halus setelah 1.5 detik
+            setTimeout(function() {
+                var splash = document.getElementById('splash-screen');
+                if (splash) {
+                    splash.style.opacity = '0';
+                    splash.style.visibility = 'hidden';
+                    setTimeout(function() { splash.remove(); }, 600);
+                }
+            }, 1500);
         });
     </script>
 </body>
