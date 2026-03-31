@@ -148,7 +148,7 @@
                 <div><h1 class="font-extrabold text-lg tracking-wide leading-tight">ABZENSI</h1><p class="text-[9px] text-brand-200 uppercase tracking-widest font-semibold dark:text-gray-400">SMP Unggulan Abu Zairi</p></div>
             </div>
             <div class="flex items-center space-x-4">
-                <div id="mobile-admin-info" class="hidden text-right md:hidden border-r border-brand-700 pr-4 mr-1"><h2 class="text-xs font-bold leading-tight truncate max-w-[100px]" id="admin-name-mobile">Admin</h2><p class="text-[8px] text-brand-200 dark:text-gray-400 uppercase tracking-widest font-semibold">Panel Admin</p></div>
+                <div id="mobile-admin-info" class="hidden text-right md:hidden border-r border-brand-700 pr-4 mr-1"><h2 class="text-xs font-bold leading-tight truncate max-w-[100px]" id="admin-name-mobile">Admin</h2><p id="admin-role-mobile" class="text-[8px] text-brand-200 dark:text-gray-400 uppercase tracking-widest font-semibold">Panel Admin</p></div>
                 <button type="button" data-action="gantiTema" class="text-white hover:text-brand-200 smooth-hover bg-white/10 p-2 rounded-full w-9 h-9 flex items-center justify-center focus:outline-none"><i id="theme-icon" class="fa-solid fa-moon pointer-events-none"></i></button>
             </div>
         </div>
@@ -225,7 +225,7 @@
             <div class="hidden md:flex glass-card rounded-2xl p-4 w-full mb-6 mt-2 justify-between items-center relative z-10 print:hidden shadow-sm">
                 <div class="flex items-center space-x-4">
                     <div class="w-12 h-12 rounded-full bg-brand-100 dark:bg-gray-700 flex items-center justify-center text-brand-700 dark:text-brand-400 font-bold text-xl shadow-sm"><i class="fa-solid fa-user-tie"></i></div>
-                    <div><h2 class="text-base font-bold text-gray-800 dark:text-white leading-tight" id="admin-name">Halo, Admin</h2><p class="text-[10px] text-brand-600 dark:text-gray-400 font-semibold uppercase tracking-widest">Pusat Manajemen</p></div>
+                    <div><h2 class="text-base font-bold text-gray-800 dark:text-white leading-tight" id="admin-name">Halo, Admin</h2><p id="admin-role" class="text-[10px] text-brand-600 dark:text-gray-400 font-semibold uppercase tracking-widest">Pusat Manajemen</p></div>
                 </div>
                 <div class="flex bg-gray-50 dark:bg-gray-800/80 p-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-inner">
                     <button type="button" data-action="keTab" data-target="tab-dashboard" class="tab-btn active px-4 py-2.5 text-xs font-semibold rounded-lg text-gray-500 data-[active=true]:bg-white data-[active=true]:text-brand-700 dark:data-[active=true]:bg-gray-700 dark:data-[active=true]:text-white smooth-hover transition-colors" data-active="true"><i class="fa-solid fa-chart-pie mr-2 pointer-events-none"></i>Dashboard</button>
@@ -605,9 +605,9 @@
 
     <script>
         // =========================================================================
-        // URL WEB APP GOOGLE APPS SCRIPT ANDA SUDAH DI-INJECT DI SINI
+        // URL WEB APP GOOGLE APPS SCRIPT SUDAH DIPERBARUI
         // =========================================================================
-        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxON_GElWFRNw2h3yGETbG8hBfmolQ4H3b4zNgoroxbH_2kur_-Qz01gR_s1f8u_Bsf/exec"; 
+        const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycby24If61mtMOcNGjQiQzDoN-dbJETLei-UYCKdUh66KR4v_HQoznFuFI8h-wBR0xMDpnw/exec"; 
 
         // ================= KUMPULAN FUNGSI UTILITAS & API =================
         var State = {
@@ -811,8 +811,13 @@
                 btn.innerHTML = teksAsli; btn.disabled = false;
                 if (res && (res.status === 'success' || res.nama)) {
                     document.getElementById('input-niy').value = '';
-                    document.getElementById('admin-name').innerText = 'Admin: ' + (res.nama || 'Utama');
-                    var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama || 'Utama';
+                    document.getElementById('admin-name').innerText = 'Halo, ' + (res.nama || 'Admin');
+                    var admMob = document.getElementById('admin-name-mobile'); if (admMob) admMob.innerText = res.nama || 'Admin';
+                    
+                    var roleVal = res.role || 'Panel Admin';
+                    var roleMob = document.getElementById('admin-role-mobile'); if (roleMob) roleMob.innerText = roleVal;
+                    var roleDesk = document.getElementById('admin-role'); if (roleDesk) roleDesk.innerText = roleVal;
+
                     var infoMob = document.getElementById('mobile-admin-info'); if (infoMob) { infoMob.classList.remove('hidden'); infoMob.classList.add('block'); }
                     keHalaman('view-admin'); keTab('tab-dashboard'); muatPengaturanSistem(true); 
                 } else {
@@ -1173,9 +1178,6 @@
             });
         }
 
-        function tambahAdmin() { alert('Tambahkan Admin di Google Sheets (Sheet Data_Admin).'); }
-        function bukaFolder() { window.open('https://drive.google.com/drive/folders/1S_heRm5OpqRT3m3P3khPGPOTVFFzBtYP', '_blank'); }
-
         function tambahSiswa() {
             if (!State.daftarKelas || State.daftarKelas.length === 0) {
                 Swal.fire({title: 'Menyiapkan Form...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); }});
@@ -1293,7 +1295,7 @@
             if(cbBulan && !cbBulan.getAttribute('data-init')) {
                 cbBulan.value = d.getMonth() + 1;
                 if(cbTahun) cbTahun.innerHTML = optTahun;
-                cbTahunIndividu.innerHTML = optTahun;
+                if(cbTahunIndividu) cbTahunIndividu.innerHTML = optTahun;
                 cbBulan.setAttribute('data-init', 'true');
             }
 
