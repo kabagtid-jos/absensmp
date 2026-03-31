@@ -613,7 +613,8 @@
             currentPageSiswa: 1, itemsPerPageSiswa: 10,
             dataLogIndividu: [], currentPageLogIndividu: 1, itemsPerPageLogIndividu: 12,
             siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false,
-            waliKelasData: {}
+            waliKelasData: {},
+            daftarKelas: [] // Tambahan state cache untuk Daftar Kelas
         };
 
         function getNamaBulan(m) {
@@ -693,6 +694,21 @@
                 }
             }
         };
+
+        // --- SISTEM CACHING UNTUK OPTIMASI LOADING ---
+        function getDaftarKelasCache(callback) {
+            if (State.daftarKelas && State.daftarKelas.length > 0) {
+                callback(State.daftarKelas);
+            } else {
+                Server.panggil('getDaftarKelas', [], function(res) {
+                    State.daftarKelas = res || [];
+                    callback(State.daftarKelas);
+                }, function(err) {
+                    console.error("Gagal load kelas:", err);
+                    callback([]);
+                });
+            }
+        }
 
         // ================= KUMPULAN FUNGSI TAMPILAN (UI) =================
         function gantiTema() {
@@ -1134,7 +1150,11 @@
             Swal.fire({ title: 'Kelas Baru', input: 'text', placeholder: 'Contoh: VII-C', showCancelButton: true, confirmButtonText: 'Simpan', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#fff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937' }).then(function(r) {
                 if(r.isConfirmed && r.value) {
                     Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
-                    Server.panggil('tambahKelas', [r.value], function(res) { Swal.fire('Berhasil', res.message || res, 'success'); });
+                    Server.panggil('tambahKelas', [r.value], function(res) { 
+                        State.daftarKelas = []; // Hapus cache agar load ulang kelas baru
+                        Swal.fire('Berhasil', res.message || res, 'success'); 
+                        initFilterRekap(true); // Update dropdown di rekap
+                    });
                 }
             });
         }
@@ -1143,7 +1163,11 @@
         function bukaFolder() { window.open('https://drive.google.com/drive/folders/1S_heRm5OpqRT3m3P3khPGPOTVFFzBtYP', '_blank'); }
 
         function tambahSiswa() {
-            Server.panggil('getDaftarKelas', [], function(dk) {
+            if (!State.daftarKelas || State.daftarKelas.length === 0) {
+                Swal.fire({title: 'Menyiapkan Form...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); }});
+            }
+            getDaftarKelasCache(function(dk) {
+                if (Swal.isVisible() && Swal.getTitle().textContent === 'Menyiapkan Form...') Swal.close();
                 var op = '<option value="">-- Pilih --</option>';
                 if(dk) { for(var i=0; i<dk.length; i++) { op += '<option value="' + dk[i] + '">' + dk[i] + '</option>'; } }
                 var isiHTML = '<div class="space-y-2 mt-1 text-left"><div class="flex flex-col items-center mb-3"><div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-gray-700 border-2 border-brand-500 overflow-hidden flex items-center justify-center mb-2 shadow-sm"><img id="preview-foto" src="https://ui-avatars.com/api/?name=Siswa&background=random" class="w-full h-full object-cover"></div><input type="hidden" id="s-foto-b64" value=""><label class="cursor-pointer text-[10px] bg-brand-100 text-brand-600 px-3 py-1 rounded-full font-bold hover:bg-brand-200 smooth-hover shadow-sm"><i class="fa-solid fa-camera mr-1"></i> Pilih Foto <input type="file" accept="image/*" class="hidden" onchange="compressImage(this)"></label></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">NISN</label><input id="s-n" type="text" inputmode="numeric" pattern="[0-9]*" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Masukkan NISN"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Nama Lengkap</label><input id="s-nm" type="text" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Nama Lengkap"></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Kelas</label><select id="s-k" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all">' + op + '</select></div><div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">No. WA</label><input id="s-w" type="text" inputmode="numeric" pattern="[0-9]*" value="" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 text-sm transition-all" placeholder="Contoh: 0812..."></div><div class="pt-2"><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">UID RFID / NFC (Opsional)</label><div class="flex space-x-2"><input id="s-rfid" type="text" class="flex-grow border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-brand-500 text-sm transition-all" placeholder="ID Kartu NFC"><button type="button" id="btn-baca-nfc" onclick="bacaNFCPendaftaran(\'s-rfid\')" class="bg-indigo-100 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-400 px-3 py-2 rounded-xl text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-wifi mr-1"></i> Tap NFC</button></div></div></div>';
@@ -1167,7 +1191,11 @@
 
         function editSiswa(idx) {
             var dt = State.dataSiswa[idx];
-            Server.panggil('getDaftarKelas', [], function(dk) {
+            if (!State.daftarKelas || State.daftarKelas.length === 0) {
+                Swal.fire({title: 'Menyiapkan Form...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); }});
+            }
+            getDaftarKelasCache(function(dk) {
+                if (Swal.isVisible() && Swal.getTitle().textContent === 'Menyiapkan Form...') Swal.close();
                 var op = '';
                 if(dk) { for(var i=0; i<dk.length; i++) { op += '<option value="' + dk[i] + '" ' + (dk[i]===dt.kelas?'selected':'') + '>' + dk[i] + '</option>'; } }
                 var currentImg = dt.foto || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(dt.nama) + '&background=random';
@@ -1216,10 +1244,21 @@
             if (State.siswaLoaded && !forceRefresh) { renderTabelSiswa(); return; }
             var t = document.getElementById('tabel-siswa'); document.getElementById('btn-hapus-masal').classList.add('hidden');
             var paginationInfo = document.getElementById('pagination-siswa');
+            
+            // OPTIMASI: Gunakan data cache (dari dropdown pencarian siswa) untuk bypass loading server
+            if (!forceRefresh && State.dataSiswaAbsen && State.dataSiswaAbsen.length > 0) {
+                State.dataSiswa = State.dataSiswaAbsen;
+                State.currentPageSiswa = 1;
+                State.siswaLoaded = true;
+                renderTabelSiswa();
+                return;
+            }
+
             if (!State.siswaLoaded) { if(paginationInfo) paginationInfo.classList.add('hidden'); t.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat...</td></tr>'; }
             
             Server.panggil('getDataSiswa', [], function(data) {
                 State.dataSiswa = data || [];
+                State.dataSiswaAbsen = data || []; // Update cache sekalian
                 if (!State.siswaLoaded || forceRefresh) State.currentPageSiswa = 1;
                 State.siswaLoaded = true; renderTabelSiswa();
             }, function(err) { if (!State.siswaLoaded) t.innerHTML = '<tr><td colspan="7" class="text-center text-rose-500 p-4">Error memuat data: ' + err + '</td></tr>'; });
@@ -1227,7 +1266,7 @@
 
 
         // ================= KUMPULAN FUNGSI REKAPITULASI & CETAK =================
-        function initFilterRekap() {
+        function initFilterRekap(forceRefreshKelas) {
             var cbBulan = document.getElementById('filter-bulan');
             var cbTahun = document.getElementById('filter-tahun');
             var cbTahunIndividu = document.getElementById('filter-tahun-individu');
@@ -1240,7 +1279,7 @@
             if(cbBulan && !cbBulan.getAttribute('data-init')) {
                 cbBulan.value = d.getMonth() + 1;
                 if(cbTahun) cbTahun.innerHTML = optTahun;
-                if(cbTahunIndividu) cbTahunIndividu.innerHTML = optTahun;
+                cbTahunIndividu.innerHTML = optTahun;
                 cbBulan.setAttribute('data-init', 'true');
             }
 
@@ -1248,8 +1287,8 @@
             var cbKelasInd = document.getElementById('filter-kelas-individu');
             var cbSetupWali = document.getElementById('setup-kelas-wali');
 
-            if (cbKelas && cbKelas.options.length <= 1) {
-                Server.panggil('getDaftarKelas', [], function(res) {
+            if (forceRefreshKelas || (cbKelas && cbKelas.options.length <= 1)) {
+                getDaftarKelasCache(function(res) {
                     var optSemua = '<option value="Semua">Semua Kelas</option>';
                     var optPilih = '<option value="">-- Pilih Kelas --</option>';
                     var optBody = '';
@@ -1257,7 +1296,7 @@
                     if (cbKelas) cbKelas.innerHTML = optSemua + optBody;
                     if (cbKelasInd) cbKelasInd.innerHTML = optPilih + optBody;
                     if (cbSetupWali) cbSetupWali.innerHTML = optPilih + optBody;
-                }, function(err) { console.error("Filter Kelas Error:", err); });
+                });
             }
         }
 
@@ -1272,10 +1311,8 @@
             }
 
             sel.disabled = false;
-            sel.innerHTML = '<option value="">Memuat...</option>';
-
-            Server.panggil('getDataSiswa', [], function(data) {
-                State.dataSiswaAbsen = data || [];
+            
+            function renderSelect(data) {
                 var html = '<option value="">-- Pilih Siswa --</option>';
                 var sorted = data.sort(function(a,b){ return a.nama.localeCompare(b.nama); });
                 var ada = false;
@@ -1288,7 +1325,17 @@
                 }
                 if (!ada) html = '<option value="">-- Tidak ada siswa di kelas ini --</option>';
                 sel.innerHTML = html;
-            });
+            }
+
+            if (State.dataSiswaAbsen && State.dataSiswaAbsen.length > 0) {
+                renderSelect(State.dataSiswaAbsen);
+            } else {
+                sel.innerHTML = '<option value="">Memuat...</option>';
+                Server.panggil('getDataSiswa', [], function(data) {
+                    State.dataSiswaAbsen = data || [];
+                    renderSelect(State.dataSiswaAbsen);
+                });
+            }
         }
 
         function jalankanCetakPDF(mode) {
@@ -1827,11 +1874,22 @@
         }
 
         function modalInputIzin() {
-            Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+            if (!State.dataSiswaAbsen || State.dataSiswaAbsen.length === 0 || !State.daftarKelas || State.daftarKelas.length === 0) {
+                Swal.fire({ title: 'Memuat data...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
+            }
 
-            Server.panggil('getDataSiswa', [], function(dataSiswa) {
-                State.dataSiswaAbsen = dataSiswa || [];
-                Server.panggil('getDaftarKelas', [], function(dataKelas) {
+            function getDataSiswaCache(cb) {
+                if (State.dataSiswaAbsen && State.dataSiswaAbsen.length > 0) cb(State.dataSiswaAbsen);
+                else {
+                    Server.panggil('getDataSiswa', [], function(res) {
+                        State.dataSiswaAbsen = res || []; cb(State.dataSiswaAbsen);
+                    }, function() { cb([]); });
+                }
+            }
+
+            getDataSiswaCache(function(dataSiswa) {
+                getDaftarKelasCache(function(dataKelas) {
+                    if (Swal.isVisible() && Swal.getTitle().textContent === 'Memuat data...') Swal.close();
                     var opKelas = '<option value="">-- Pilih Kelas --</option>';
                     if(dataKelas) { for(var i=0; i<dataKelas.length; i++) opKelas += '<option value="' + dataKelas[i] + '">' + dataKelas[i] + '</option>'; }
 
