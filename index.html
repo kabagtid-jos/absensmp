@@ -239,7 +239,10 @@
             <div id="tab-dashboard" class="tab-content active w-full">
                 <!-- Dashboard Content -->
                 <div class="flex justify-between items-center mb-6 mt-2">
-                    <h3 class="text-xl font-extrabold text-gray-800 dark:text-white"><i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i> Dashboard</h3>
+                    <h3 class="text-xl font-extrabold text-gray-800 dark:text-white flex items-center">
+                        <i class="fa-solid fa-chart-pie mr-2 text-brand-500"></i> Dashboard
+                        <button type="button" data-action="refreshDashboard" class="ml-3 text-[10px] text-gray-400 hover:text-brand-500 bg-gray-100 dark:bg-gray-800 hover:bg-brand-50 dark:hover:bg-gray-700 px-2 py-1 rounded-md transition-colors smooth-hover shadow-sm" title="Segarkan Data"><i class="fa-solid fa-rotate-right pointer-events-none"></i></button>
+                    </h3>
                     <div class="flex items-center space-x-2 bg-white dark:bg-gray-800 px-3 py-1.5 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm relative z-30 smooth-hover">
                         <i class="fa-solid fa-calendar-days text-brand-500 text-sm"></i>
                         <select id="global-tahun-dashboard" data-action="ubahTahunDashboard" class="bg-transparent text-sm font-bold outline-none cursor-pointer text-gray-700 dark:text-gray-200 pr-2 appearance-none pl-1">
@@ -612,7 +615,7 @@
             dataSiswa: [], dataSiswaAbsen: [], pChart: null, bChart: null,
             currentPageSiswa: 1, itemsPerPageSiswa: 10,
             dataLogIndividu: [], currentPageLogIndividu: 1, itemsPerPageLogIndividu: 12,
-            siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false,
+            siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false, rekapLoaded: false,
             waliKelasData: {},
             daftarKelas: [] // Tambahan state cache untuk Daftar Kelas
         };
@@ -767,7 +770,14 @@
             
             if (idTab === 'tab-dashboard') muatDashboard(false);
             if (idTab === 'tab-siswa') muatSiswa(false);
-            if (idTab === 'tab-rekap') { initFilterRekap(); submitRekap(); muatPengaturanSistem(true); } 
+            if (idTab === 'tab-rekap') { 
+                initFilterRekap(); 
+                if (!State.rekapLoaded) {
+                    submitRekap(); 
+                    State.rekapLoaded = true;
+                }
+                muatPengaturanSistem(false); 
+            } 
             if (idTab === 'tab-setup') muatPengaturanSistem(false);
         }
 
@@ -814,7 +824,7 @@
         function keluarAdmin() {
             var infoMob = document.getElementById('mobile-admin-info');
             if (infoMob) { infoMob.classList.add('hidden'); infoMob.classList.remove('block'); }
-            State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false;
+            State.siswaLoaded = false; State.dashboardLoaded = false; State.rekapLogLoaded = false; State.setupLoaded = false; State.rekapLoaded = false;
             
             var inpWali = document.getElementById('setup-wali');
             if (inpWali) { inpWali.value = ''; inpWali.disabled = true; }
@@ -1039,6 +1049,10 @@
 
         function muatDashboard(forceRefresh, tahunTerpilih) {
             muatLogDashboard(forceRefresh); 
+            
+            // OPTIMASI: Return langsung jika dashboard sudah dimuat dan tidak ada paksaan refresh
+            if (State.dashboardLoaded && !forceRefresh && !tahunTerpilih) return;
+            
             var tahunReq = tahunTerpilih || new Date().getFullYear();
             var selTahun = document.getElementById('global-tahun-dashboard');
             if (selTahun && (!selTahun.getAttribute('data-init') || forceRefresh)) selTahun.innerHTML = '<option>Memuat...</option>';
@@ -1938,6 +1952,12 @@
             
             var aksi = elemen.getAttribute('data-action');
             if (aksi === 'gantiTema') gantiTema();
+            else if (aksi === 'refreshDashboard') {
+                var iconBtn = elemen.querySelector('i');
+                if (iconBtn) iconBtn.classList.add('fa-spin');
+                muatDashboard(true);
+                setTimeout(function() { if (iconBtn) iconBtn.classList.remove('fa-spin'); }, 1000);
+            }
             else if (aksi === 'keHalaman') keHalaman(elemen.getAttribute('data-target'));
             else if (aksi === 'keTab') keTab(elemen.getAttribute('data-target'));
             else if (aksi === 'bukaKamera') bukaKamera();
