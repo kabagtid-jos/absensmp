@@ -60,6 +60,7 @@
         ::-webkit-scrollbar { width: 6px; height: 6px; } ::-webkit-scrollbar-track { background: transparent; } ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; } .dark ::-webkit-scrollbar-thumb { background: #475569; }
         .print-only-signature { display: none !important; }
 
+        /* PENYESUAIAN UKURAN POP-UP UNTUK MOBILE */
         div:where(.swal2-container) div:where(.swal2-popup) {
             width: 85% !important; 
             max-width: 300px !important; 
@@ -162,7 +163,6 @@
                 <div><h1 class="font-extrabold text-lg tracking-wide leading-tight">ABZENSI</h1><p class="text-[9px] text-brand-200 uppercase tracking-widest font-semibold dark:text-gray-400">SMP Unggulan Abu Zairi</p></div>
             </div>
             <div class="flex items-center space-x-4">
-                <!-- Perubahan ada pada baris di bawah ini: menghapus 'truncate max-w-[100px]' diganti menjadi 'whitespace-normal max-w-[160px]' -->
                 <div id="mobile-admin-info" class="hidden text-right md:hidden border-r border-brand-700 pr-4 mr-1"><h2 class="text-xs font-bold leading-tight whitespace-normal max-w-[160px]" id="admin-name-mobile">Admin</h2><p id="admin-role-mobile" class="text-[8px] text-brand-200 dark:text-gray-400 uppercase tracking-widest font-semibold mt-0.5">Panel Admin</p></div>
                 <button type="button" data-action="gantiTema" class="text-white hover:text-brand-200 smooth-hover bg-white/10 p-2 rounded-full w-9 h-9 flex items-center justify-center focus:outline-none"><i id="theme-icon" class="fa-solid fa-moon pointer-events-none"></i></button>
             </div>
@@ -188,9 +188,14 @@
                     </div>
                 </div>
 
-                <div class="flex space-x-3 mb-4 w-full justify-center">
+                <div id="wrap-btn-scan" class="flex space-x-3 mb-4 w-full justify-center">
                     <button type="button" data-action="bukaKamera" id="btn-start-scan" class="flex-1 bg-gradient-to-r from-brand-700 to-brand-500 text-white font-semibold py-3.5 px-2 rounded-xl shadow-lg smooth-hover relative z-20 text-xs sm:text-sm tracking-wide"><i class="fa-solid fa-camera mr-1 pointer-events-none"></i> Scan Barcode</button>
                     <button type="button" data-action="bukaNFC" id="btn-start-nfc" class="flex-1 bg-gradient-to-r from-indigo-700 to-indigo-500 text-white font-semibold py-3.5 px-2 rounded-xl shadow-lg smooth-hover relative z-20 text-xs sm:text-sm tracking-wide"><i class="fa-solid fa-id-card-clip mr-1 pointer-events-none"></i> Tap NFC/RFID</button>
+                </div>
+
+                <!-- Tombol Hentikan Kamera (Ditampilkan saat kamera aktif) -->
+                <div id="wrap-btn-stop" class="hidden space-x-3 mb-4 w-full justify-center">
+                    <button type="button" data-action="matikanScannerUI" class="flex-1 bg-gradient-to-r from-rose-600 to-red-500 text-white font-bold py-3.5 px-2 rounded-xl shadow-lg smooth-hover relative z-20 text-xs sm:text-sm tracking-wide border border-rose-400/50"><i class="fa-solid fa-video-slash mr-1 pointer-events-none"></i> Hentikan Kamera</button>
                 </div>
 
                 <div class="flex items-center my-6 opacity-70"><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div><span class="px-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Atau Manual</span><div class="flex-grow border-t border-gray-300 dark:border-gray-600"></div></div>
@@ -868,18 +873,42 @@
         function bukaKamera() {
             if(typeof Html5Qrcode === 'undefined') return Swal.fire('Info', 'Sistem memuat. Coba beberapa detik lagi.', 'info');
             document.getElementById('scanner-placeholder').style.display = 'none'; 
+            
+            var wScan = document.getElementById('wrap-btn-scan');
+            var wStop = document.getElementById('wrap-btn-stop');
+            if(wScan) { wScan.classList.add('hidden'); wScan.classList.remove('flex'); }
+            if(wStop) { wStop.classList.remove('hidden'); wStop.classList.add('flex'); }
+
             State.kamera = new Html5Qrcode("reader");
             State.kamera.start({ facingMode: "environment" }, { fps: 10, qrbox: { width: 250, height: 250 } }, 
                 function(teks) { matikanScanner(); kirimAbsen(teks, true); }, function(err) {}
             ).then(function() { State.kameraAktif = true; }).catch(function(e) {
                 document.getElementById('scanner-placeholder').style.display = 'flex'; 
+                if(wScan) { wScan.classList.remove('hidden'); wScan.classList.add('flex'); }
+                if(wStop) { wStop.classList.add('hidden'); wStop.classList.remove('flex'); }
                 Swal.fire('Kamera Error', 'Mohon izinkan akses kamera di browser Anda', 'error');
             });
         }
 
         function matikanScanner() {
+            var wScan = document.getElementById('wrap-btn-scan');
+            var wStop = document.getElementById('wrap-btn-stop');
+
             if (State.kamera && State.kameraAktif) {
-                State.kamera.stop().then(function() { State.kameraAktif = false; document.getElementById('scanner-placeholder').style.display = 'flex'; });
+                State.kamera.stop().then(function() { 
+                    State.kameraAktif = false; 
+                    document.getElementById('scanner-placeholder').style.display = 'flex'; 
+                    if(wScan) { wScan.classList.remove('hidden'); wScan.classList.add('flex'); }
+                    if(wStop) { wStop.classList.add('hidden'); wStop.classList.remove('flex'); }
+                }).catch(function(e) {
+                    State.kameraAktif = false;
+                    document.getElementById('scanner-placeholder').style.display = 'flex'; 
+                    if(wScan) { wScan.classList.remove('hidden'); wScan.classList.add('flex'); }
+                    if(wStop) { wStop.classList.add('hidden'); wStop.classList.remove('flex'); }
+                });
+            } else {
+                if(wScan) { wScan.classList.remove('hidden'); wScan.classList.add('flex'); }
+                if(wStop) { wStop.classList.add('hidden'); wStop.classList.remove('flex'); }
             }
             matikanNFC();
         }
@@ -2006,6 +2035,7 @@
             else if (aksi === 'keHalaman') keHalaman(elemen.getAttribute('data-target'));
             else if (aksi === 'keTab') keTab(elemen.getAttribute('data-target'));
             else if (aksi === 'bukaKamera') bukaKamera();
+            else if (aksi === 'matikanScannerUI') matikanScanner();
             else if (aksi === 'bukaNFC') bukaNFC();
             else if (aksi === 'kirimManual') kirimManual();
             else if (aksi === 'prosesLogin') prosesLogin();
