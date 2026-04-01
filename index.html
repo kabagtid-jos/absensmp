@@ -61,16 +61,30 @@
         .print-only-signature { display: none !important; }
 
         div:where(.swal2-container) div:where(.swal2-popup) {
-            width: 88% !important; 
-            max-width: 380px !important; 
-            border-radius: 1.5rem !important; 
-            padding: 1.25rem !important; 
+            width: 85% !important; 
+            max-width: 300px !important; 
+            border-radius: 1.25rem !important; 
+            padding: 1rem !important; 
         }
         div:where(.swal2-container) h2:where(.swal2-title) {
-            font-size: 1.15rem !important; 
+            font-size: 1.05rem !important; 
+            padding: 0 !important;
         }
         div:where(.swal2-container) div:where(.swal2-html-container) {
-            margin: 1em 0 0.5em !important; 
+            margin: 0.5em 0 0.25em !important; 
+            font-size: 0.85rem !important;
+        }
+        div:where(.swal2-container) div:where(.swal2-icon) {
+            transform: scale(0.7) !important;
+            margin: 0.5rem auto 0 !important;
+        }
+        div:where(.swal2-container) button:where(.swal2-styled) {
+            padding: 0.5em 1.25em !important;
+            font-size: 0.85rem !important;
+            border-radius: 0.75rem !important;
+        }
+        div:where(.swal2-container) div:where(.swal2-actions) {
+            margin-top: 0.5rem !important;
         }
 
         @media print {
@@ -942,14 +956,24 @@
         function kirimAbsen(nisn, dariKamera) {
             Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: function() { Swal.showLoading(); } });
             Server.panggil('catatAbsensi', [nisn], function(res) {
-                if(res && (res.status === 'success' || res.message)) {
-                    Swal.fire({ icon: 'success', title: 'Tercatat!', text: res.message || res, timer: 2000, showConfirmButton: false });
+                if (res && res.status === 'success') {
+                    Swal.fire({ icon: 'success', title: 'Tercatat!', text: res.message || 'Absen berhasil', timer: 2000, showConfirmButton: false });
                     if (dariKamera) {
                         setTimeout(function() { bukaKamera(); }, 2500); 
                     }
                     muatAbsenHariIni(true);
-                } else Swal.fire('Gagal', res ? (res.message || res) : 'Siswa tidak ditemukan/Sudah Absen', 'error');
-            }, function(err) { Swal.fire('Gagal/Error', String(err), 'error'); });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Ditolak!', text: res ? (res.message || 'Siswa tidak ditemukan/Sudah Absen') : 'Terjadi Kesalahan' });
+                    if (dariKamera) {
+                        setTimeout(function() { bukaKamera(); }, 3500); 
+                    }
+                }
+            }, function(err) { 
+                Swal.fire({ icon: 'error', title: 'Gagal/Error', text: String(err) }); 
+                if (dariKamera) {
+                    setTimeout(function() { bukaKamera(); }, 3500); 
+                }
+            });
         }
 
         function muatDataSiswaDropdown() {
@@ -1829,8 +1853,8 @@
 
             Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
             Server.panggil('simpanPengaturan', [payload], function(res) {
-                if(res && (res.status === 'success' || res.message)) {
-                    Swal.fire('Berhasil', res.message || res, 'success');
+                if (res && res.status === 'success') {
+                    Swal.fire('Berhasil', res.message || 'Pengaturan disimpan', 'success');
                     var dispBatasMulai = document.getElementById('display-batas-mulai');
                     var dispBatas = document.getElementById('display-batas-waktu');
                     var dispBatasAkhir = document.getElementById('display-batas-akhir');
@@ -1839,7 +1863,9 @@
                     if(dispBatasAkhir) dispBatasAkhir.innerText = batasAkhir;
                     
                     muatPengaturanSistem(true); 
-                } else Swal.fire('Gagal', res ? (res.message || res) : 'Terjadi kesalahan', 'error');
+                } else {
+                    Swal.fire('Gagal', res ? (res.message || 'Terjadi kesalahan') : 'Terjadi kesalahan', 'error');
+                }
             }, function(err) { Swal.fire('Error', String(err), 'error'); });
         }
 
@@ -1943,8 +1969,13 @@
                         if (h.isConfirmed) {
                             Swal.fire({title: 'Menyimpan...', didOpen: function() { Swal.showLoading(); }});
                             Server.panggil('inputIzinSiswa', [h.value], function(res) { 
-                                if(res && (res.status === 'success' || res.message)) { Swal.fire('Berhasil', res.message || res, 'success'); muatDashboard(true); muatAbsenHariIni(true); } 
-                                else Swal.fire('Gagal', res ? (res.message || res) : 'Terjadi Kesalahan', 'error');
+                                if (res && res.status === 'success') { 
+                                    Swal.fire('Berhasil', res.message || 'Keterangan disimpan', 'success'); 
+                                    muatDashboard(true); 
+                                    muatAbsenHariIni(true); 
+                                } else { 
+                                    Swal.fire('Gagal', res ? (res.message || 'Terjadi Kesalahan') : 'Terjadi Kesalahan', 'error'); 
+                                }
                             }, function(err) { Swal.fire('Error', String(err), 'error'); });
                         }
                     });
