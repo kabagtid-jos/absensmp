@@ -418,7 +418,7 @@
 
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-4 print:hidden flex flex-wrap gap-3 items-center text-[11px] text-gray-600 dark:text-gray-400">
                             <span class="font-bold text-gray-800 dark:text-gray-200 mr-2"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Petunjuk:</span>
-                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><b class="text-red-500">L</b> = Libur</span><span><b class="text-purple-500">CM</b> = Classmeeting</span><span><b class="text-emerald-500">%</b> = Persentase Kehadiran</span>
+                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><b class="text-red-500">L</b> = Libur</span><span><b class="text-purple-500">CM</b> = Classmeeting</span><span><b class="text-amber-600">U</b> = Ujian</span><span><b class="text-sky-600">K</b> = Kegiatan</span><span><b class="text-emerald-500">%</b> = Persentase Kehadiran</span>
                         </div>
 
                         <div id="info-kaldik-bulanan" class="hidden bg-sky-50/70 dark:bg-sky-900/20 p-3 rounded-lg border border-sky-100 dark:border-sky-900/40 mb-4 print:hidden text-[11px] text-sky-900 dark:text-sky-100 leading-relaxed"></div>
@@ -1950,7 +1950,8 @@
             }
 
             var html = '<div class="font-bold mb-1"><i class="fa-solid fa-calendar-check mr-1"></i> Kalender Pendidikan & Hari Efektif</div>' +
-                '<div>Hari efektif yang dipakai sebagai dasar persentase kehadiran bulan ini: <b>' + (hariEfektifBulan || 0) + ' hari</b>.</div>';
+                '<div>Hari efektif yang dipakai sebagai dasar persentase kehadiran bulan ini: <b>' + (hariEfektifBulan || 0) + ' hari</b>.</div>' +
+                '<div class="mt-1 text-sky-700 dark:text-sky-200">Tanggal kalender yang dihitung efektif, seperti Ujian atau Kegiatan Sekolah, akan tampil sebagai kode kalender dan tidak otomatis menjadi Alpa.</div>';
             if (items.length > 0) html += '<ul class="list-disc ml-5 mt-1 space-y-0.5">' + items.join('') + '</ul>';
             else html += '<div class="mt-1 text-sky-700 dark:text-sky-200">Tidak ada catatan kalender khusus pada bulan ini selain libur mingguan bawaan.</div>';
             box.innerHTML = html;
