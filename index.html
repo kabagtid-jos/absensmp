@@ -418,7 +418,7 @@
 
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-4 print:hidden flex flex-wrap gap-3 items-center text-[11px] text-gray-600 dark:text-gray-400">
                             <span class="font-bold text-gray-800 dark:text-gray-200 mr-2"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Petunjuk:</span>
-                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><b class="text-red-500">L</b> = Libur</span><span><b class="text-purple-500">CM</b> = Classmeeting</span><span><b class="text-amber-600">U</b> = Ujian</span><span><b class="text-sky-600">K</b> = Kegiatan</span><span><b class="text-emerald-500">%</b> = Persentase Kehadiran</span>
+                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><b class="text-red-500">L</b> = Libur</span><span><b class="text-purple-500">CM</b> = Classmeeting</span><span><b class="text-emerald-500">%</b> = Persentase Kehadiran</span>
                         </div>
 
                         <div id="info-kaldik-bulanan" class="hidden bg-sky-50/70 dark:bg-sky-900/20 p-3 rounded-lg border border-sky-100 dark:border-sky-900/40 mb-4 print:hidden text-[11px] text-sky-900 dark:text-sky-100 leading-relaxed"></div>
@@ -1535,6 +1535,8 @@
                 if (dk.length === 0) return Swal.fire('Belum Ada Kelas', 'Tambahkan daftar kelas terlebih dahulu.', 'warning');
                 var tahunIni = new Date().getFullYear();
                 var tahunAjaranDefault = tahunIni + '/' + (tahunIni + 1);
+                var tanggalDefault = new Date();
+                var tanggalMulaiDefault = tanggalDefault.getFullYear() + '-' + String(tanggalDefault.getMonth() + 1).padStart(2, '0') + '-' + String(tanggalDefault.getDate()).padStart(2, '0');
                 var rows = '';
                 for (var i=0; i<dk.length; i++) {
                     var kelasLama = dk[i];
@@ -1547,25 +1549,28 @@
                 }
                 var html = '<div class="space-y-3 text-left">' +
                     '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Tahun Ajaran Baru</label><input id="naik-tahun-ajaran" type="text" value="' + tahunAjaranDefault + '" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-emerald-500 text-sm"></div>' +
-                    '<div class="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-[11px] text-amber-800 dark:text-amber-200 leading-relaxed"><b>Catatan:</b> fitur ini mengubah kelas aktif di Data_Siswa tetapi tetap mencatat jejaknya di Riwayat_Kelas. Absensi lama tidak dihapus.</div>' +
+                    '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Tanggal Mulai Siswa Naik Kelas</label><input id="naik-tanggal-mulai" type="date" value="' + tanggalMulaiDefault + '" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-3 outline-none focus:border-emerald-500 text-sm"><p class="mt-1 text-[10px] text-gray-500 dark:text-gray-400">Tanggal ini dipakai sebagai tanggal efektif kelas baru pada menu rekap.</p></div>' +
+                    '<div class="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-xl text-[11px] text-amber-800 dark:text-amber-200 leading-relaxed"><b>Catatan:</b> fitur ini mengubah kelas aktif di Data_Siswa tetapi tetap mencatat jejaknya di Riwayat_Kelas. Absensi lama tidak dihapus. Jalankan proses ini pada atau setelah tanggal mulai agar absensi harian tidak berpindah kelas terlalu awal.</div>' +
                     '<div class="space-y-2 max-h-72 overflow-y-auto">' + rows + '</div>' +
                     '</div>';
                 Swal.fire({
                     title: '<h3 class="text-lg font-bold">Kenaikan Kelas Massal</h3>', html: html, width: 520, showCancelButton: true, confirmButtonText: 'Proses Kenaikan', confirmButtonColor: '#059669', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937',
                     preConfirm: function() {
                         var tahunAjaran = document.getElementById('naik-tahun-ajaran').value.trim();
+                        var tanggalMulai = document.getElementById('naik-tanggal-mulai').value;
                         var selects = document.querySelectorAll('.kelas-naik');
                         var mappings = [];
                         for (var x=0; x<selects.length; x++) {
                             if (selects[x].value) mappings.push({ kelasLama: selects[x].getAttribute('data-kelas-lama'), kelasBaru: selects[x].value });
                         }
                         if (!tahunAjaran) { Swal.showValidationMessage('Tahun ajaran wajib diisi.'); return false; }
+                        if (!tanggalMulai) { Swal.showValidationMessage('Tanggal mulai siswa naik kelas wajib diisi.'); return false; }
                         if (mappings.length === 0) { Swal.showValidationMessage('Minimal satu kelas harus dipilih untuk dinaikkan.'); return false; }
-                        return { tahunAjaran: tahunAjaran, mappings: mappings };
+                        return { tahunAjaran: tahunAjaran, tanggalMulai: tanggalMulai, mappings: mappings };
                     }
                 }).then(function(result) {
                     if (!result.isConfirmed) return;
-                    Swal.fire({ title: 'Konfirmasi Kenaikan Kelas', html: 'Pastikan mapping kelas sudah benar. Proses ini akan mengubah kelas aktif siswa dan mencatat riwayatnya.', icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Proses', confirmButtonColor: '#059669' }).then(function(konfirmasi) {
+                    Swal.fire({ title: 'Konfirmasi Kenaikan Kelas', html: 'Pastikan mapping kelas sudah benar. Proses ini akan mengubah kelas aktif siswa dan mencatat riwayatnya.<br><br><b>Tanggal mulai kelas baru:</b> ' + escapeHTML(result.value.tanggalMulai), icon: 'warning', showCancelButton: true, confirmButtonText: 'Ya, Proses', confirmButtonColor: '#059669' }).then(function(konfirmasi) {
                         if (!konfirmasi.isConfirmed) return;
                         Swal.fire({title: 'Memproses...', didOpen: function() { Swal.showLoading(); }});
                         Server.panggil('naikKelasMassal', [result.value], function(res) {
@@ -1950,12 +1955,20 @@
             }
 
             var html = '<div class="font-bold mb-1"><i class="fa-solid fa-calendar-check mr-1"></i> Kalender Pendidikan & Hari Efektif</div>' +
-                '<div>Hari efektif yang dipakai sebagai dasar persentase kehadiran bulan ini: <b>' + (hariEfektifBulan || 0) + ' hari</b>.</div>' +
-                '<div class="mt-1 text-sky-700 dark:text-sky-200">Tanggal kalender yang dihitung efektif, seperti Ujian atau Kegiatan Sekolah, akan tampil sebagai kode kalender dan tidak otomatis menjadi Alpa.</div>';
+                '<div>Hari efektif yang dipakai sebagai dasar persentase kehadiran bulan ini: <b>' + (hariEfektifBulan || 0) + ' hari</b>.</div>';
             if (items.length > 0) html += '<ul class="list-disc ml-5 mt-1 space-y-0.5">' + items.join('') + '</ul>';
             else html += '<div class="mt-1 text-sky-700 dark:text-sky-200">Tidak ada catatan kalender khusus pada bulan ini selain libur mingguan bawaan.</div>';
             box.innerHTML = html;
             box.classList.remove('hidden');
+        }
+
+        function buatBadgeKenaikanKelas(row) {
+            var info = row && Array.isArray(row.kenaikanKelasBulan) ? row.kenaikanKelasBulan : [];
+            if (!info.length) return '';
+            var item = info[0] || {};
+            var teks = 'Mulai ' + (item.tanggalLabel || item.tanggalMulai || '-') + ': ' + (item.kelasLama || '-') + ' → ' + (item.kelasBaru || '-');
+            if (info.length > 1) teks += ' +' + (info.length - 1) + ' riwayat';
+            return '<div class="mt-1 inline-flex items-center max-w-full px-1.5 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800 text-[8px] font-bold leading-tight" title="' + escapeHTML(teks) + '"><i class="fa-solid fa-arrow-up-right-dots mr-1"></i><span class="truncate">' + escapeHTML(teks) + '</span></div>';
         }
 
         function buildRekapTable(data, bulan, tahun, meta) {
@@ -2015,7 +2028,8 @@
 
                 trBulanHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[1px_0_0_#e2e8f0] dark:shadow-[1px_0_0_#334155]">' + (j + 1) + '</td>';
-                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] truncate max-w-[150px] text-[10px] md:text-xs">' + escapeHTML(row.nama) + '</td>';
+                var badgeKenaikan = buatBadgeKenaikanKelas(row);
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] max-w-[170px] text-[10px] md:text-xs"><div class="truncate">' + escapeHTML(row.nama) + '</div>' + badgeKenaikan + '</td>';
                 for (var d = 1; d <= daysInMonth; d++) {
                     var status = row.absensi[d];
                     var cellTeks = ''; var cellBg = ''; var titleCell = '';
@@ -2047,7 +2061,7 @@
 
                 trTahunHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 z-10">' + (j + 1) + '</td>';
-                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 z-10 truncate max-w-[150px] text-[10px] md:text-xs">' + escapeHTML(row.nama) + '</td>';
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 z-10 max-w-[170px] text-[10px] md:text-xs"><div class="truncate">' + escapeHTML(row.nama) + '</div>' + badgeKenaikan + '</td>';
                 for(var mt=1; mt<=12; mt++) {
                     var statM = row.statPerBulan[mt];
                     var cellIsi = '';
