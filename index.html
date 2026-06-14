@@ -418,8 +418,10 @@
 
                         <div class="bg-blue-50/50 dark:bg-blue-900/10 p-3 rounded-lg border border-blue-100 dark:border-blue-900/30 mb-4 print:hidden flex flex-wrap gap-3 items-center text-[11px] text-gray-600 dark:text-gray-400">
                             <span class="font-bold text-gray-800 dark:text-gray-200 mr-2"><i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Petunjuk:</span>
-                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><span class="inline-block w-3 h-3 bg-red-100 border border-red-200 align-middle mr-1 rounded-sm"></span>= Libur (Jumat)</span>
+                            <span><b class="text-brand-600 dark:text-brand-400">v</b> = Hadir</span><span><b class="text-amber-500">TL</b> = Terlambat</span><span><b class="text-orange-500">I</b> = Izin</span><span><b class="text-blue-500">S</b> = Sakit</span><span><b class="text-rose-500">A</b> = Alpa</span><span><b class="text-red-500">L</b> = Libur</span><span><b class="text-purple-500">CM</b> = Classmeeting</span><span><b class="text-emerald-500">%</b> = Persentase Kehadiran</span>
                         </div>
+
+                        <div id="info-kaldik-bulanan" class="hidden bg-sky-50/70 dark:bg-sky-900/20 p-3 rounded-lg border border-sky-100 dark:border-sky-900/40 mb-4 print:hidden text-[11px] text-sky-900 dark:text-sky-100 leading-relaxed"></div>
 
                         <div id="wrap-rekap-bulanan">
                             <div class="hidden print-header"><h2>Rekap Absen Bulanan</h2><h3>SMP Unggulan Abu Zairi</h3><p id="print-subtitle"></p></div>
@@ -542,6 +544,11 @@
                             <div class="pointer-events-none"><h4 class="font-bold text-gray-800 dark:text-white text-sm pointer-events-none">Kenaikan Kelas Massal</h4><p class="text-[11px] text-gray-500 dark:text-gray-400 pointer-events-none mt-0.5">Naikkan kelas tanpa menghapus riwayat absensi lama</p></div>
                             <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
                         </button>
+                        <button type="button" data-action="modalKalenderPendidikan" id="btn-kalender-pendidikan" class="flex items-center p-5 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800 rounded-2xl smooth-hover relative z-20 shadow-sm">
+                            <div class="w-12 h-12 rounded-xl bg-white dark:bg-gray-700 flex items-center justify-center text-sky-600 dark:text-sky-400 mr-4 shadow-sm pointer-events-none"><i class="fa-solid fa-calendar-days text-lg pointer-events-none"></i></div>
+                            <div class="pointer-events-none"><h4 class="font-bold text-gray-800 dark:text-white text-sm pointer-events-none">Kalender Pendidikan</h4><p class="text-[11px] text-gray-500 dark:text-gray-400 pointer-events-none mt-0.5">Atur libur, classmeeting, ujian, dan hitung hari efektif</p></div>
+                            <i class="fa-solid fa-chevron-right ml-auto text-gray-300 dark:text-gray-600"></i>
+                        </button>
                     </div>
 
                     <div class="space-y-6 text-left mb-6">
@@ -644,7 +651,8 @@
             siswaLoaded: false, dashboardLoaded: false, rekapLogLoaded: false, setupLoaded: false, rekapLoaded: false,
             roleAdmin: '', // Variabel baru untuk menampung hak akses
             waliKelasData: {},
-            daftarKelas: [] // Tambahan state cache untuk Daftar Kelas
+            daftarKelas: [], // Tambahan state cache untuk Daftar Kelas
+            kalenderBulanAktif: {}, hariEfektifBulanAktif: 0
         };
 
         function getNamaBulan(m) {
@@ -1397,6 +1405,130 @@
             return '';
         }
 
+
+        function kodeKalenderFront(info) {
+            var jenis = String((info && info.jenis) || '').toLowerCase();
+            if (jenis.indexOf('class') > -1 || jenis.indexOf('meeting') > -1) return 'CM';
+            if (jenis.indexOf('ujian') > -1 || jenis.indexOf('asesmen') > -1) return 'U';
+            if (jenis.indexOf('kegiatan') > -1 || jenis.indexOf('acara') > -1) return 'K';
+            if (jenis.indexOf('cuti') > -1) return 'C';
+            if (jenis.indexOf('libur') > -1) return 'L';
+            return 'Ket';
+        }
+
+        function labelEfektifKalender(efektif) {
+            return efektif === 'Ya' || efektif === true ? 'Dihitung hari efektif' : 'Tidak dihitung hari efektif';
+        }
+
+        function formatTanggalPendekISO(iso) {
+            if (!iso) return '-';
+            var p = String(iso).split('-');
+            if (p.length !== 3) return iso;
+            return p[2] + '/' + p[1] + '/' + p[0];
+        }
+
+        function tahunOptionsKalender() {
+            var y = new Date().getFullYear();
+            var html = '';
+            for (var i = y - 2; i <= y + 3; i++) html += '<option value="' + i + '" ' + (i === y ? 'selected' : '') + '>' + i + '</option>';
+            return html;
+        }
+
+        function modalKalenderPendidikan() {
+            var html = '' +
+                '<div class="text-left space-y-4">' +
+                    '<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">' +
+                        '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Tahun</label><select id="kaldik-tahun" data-action="ubahTahunKalenderPendidikan" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none">' + tahunOptionsKalender() + '</select></div>' +
+                        '<div class="sm:col-span-2 text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed bg-sky-50 dark:bg-sky-900/20 border border-sky-100 dark:border-sky-800 rounded-xl p-3"><b>Catatan:</b> entri yang tidak dihitung efektif akan otomatis dikeluarkan dari denominator persentase kehadiran.</div>' +
+                    '</div>' +
+                    '<div class="grid grid-cols-1 sm:grid-cols-2 gap-3">' +
+                        '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Tanggal Mulai</label><input id="kaldik-mulai" type="date" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none"></div>' +
+                        '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Tanggal Selesai</label><input id="kaldik-selesai" type="date" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none"></div>' +
+                        '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Jenis</label><select id="kaldik-jenis" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none"><option>Libur Umum</option><option>Libur Sekolah</option><option>Cuti Bersama</option><option>Class Meeting</option><option>Ujian/Asesmen</option><option>Kegiatan Sekolah</option><option>Lainnya</option></select></div>' +
+                        '<div><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Hitung Hari Efektif?</label><select id="kaldik-efektif" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none"><option value="Tidak">Tidak</option><option value="Ya">Ya</option></select></div>' +
+                        '<div class="sm:col-span-2"><label class="text-[11px] font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-1 block">Keterangan</label><input id="kaldik-keterangan" type="text" placeholder="Contoh: Libur Maulid Nabi / Classmeeting Semester Ganjil" class="w-full border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-black dark:text-white rounded-xl p-2.5 text-sm outline-none"></div>' +
+                    '</div>' +
+                    '<button type="button" data-action="simpanKalenderPendidikan" class="w-full bg-sky-600 hover:bg-sky-700 text-white text-sm font-bold py-3 rounded-xl shadow-md smooth-hover"><i class="fa-solid fa-save mr-1 pointer-events-none"></i> Simpan Kalender Pendidikan</button>' +
+                    '<div class="border-t border-gray-200 dark:border-gray-700 pt-3"><h4 class="text-sm font-bold text-gray-800 dark:text-white mb-2">Daftar Kalender Tahun Terpilih</h4><div id="list-kaldik" class="max-h-72 overflow-y-auto text-xs"><div class="p-4 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat...</div></div></div>' +
+                '</div>';
+            Swal.fire({ title: '<h3 class="text-lg font-bold">Kalender Pendidikan</h3>', html: html, width: 760, showConfirmButton: false, showCloseButton: true, background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937' });
+            setTimeout(muatKalenderPendidikanModal, 100);
+        }
+
+        function muatKalenderPendidikanModal() {
+            var tahunEl = document.getElementById('kaldik-tahun');
+            var list = document.getElementById('list-kaldik');
+            if (!tahunEl || !list) return;
+            var tahun = tahunEl.value;
+            list.innerHTML = '<div class="p-4 text-center text-gray-400"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Memuat kalender...</div>';
+            Server.panggil('getKalenderPendidikan', [tahun], function(res) {
+                res = res || [];
+                if (res.length === 0) {
+                    list.innerHTML = '<div class="p-4 text-center text-gray-400 bg-gray-50 dark:bg-gray-700/50 rounded-xl">Belum ada kalender pendidikan untuk tahun ini.</div>';
+                    return;
+                }
+                var html = '<div class="space-y-2">';
+                for (var i = 0; i < res.length; i++) {
+                    var r = res[i];
+                    var badge = (r.efektif === 'Ya') ? 'bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300' : 'bg-rose-50 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300';
+                    html += '<div class="flex items-start gap-3 p-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">' +
+                        '<div class="w-10 h-10 rounded-lg bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-300 flex items-center justify-center font-black text-xs shrink-0">' + escapeHTML(r.kode || kodeKalenderFront(r)) + '</div>' +
+                        '<div class="flex-1 min-w-0"><div class="font-bold text-gray-800 dark:text-white">' + escapeHTML(r.jenis || '-') + '</div>' +
+                        '<div class="text-[11px] text-gray-500 dark:text-gray-400">' + formatTanggalPendekISO(r.mulai) + (r.selesai && r.selesai !== r.mulai ? ' s.d. ' + formatTanggalPendekISO(r.selesai) : '') + '</div>' +
+                        '<div class="text-[11px] mt-1 text-gray-600 dark:text-gray-300 break-words">' + escapeHTML(r.keterangan || '-') + '</div>' +
+                        '<span class="inline-block mt-2 px-2 py-1 rounded-full text-[10px] font-bold ' + badge + '">' + labelEfektifKalender(r.efektif) + '</span></div>' +
+                        '<button type="button" data-action="hapusKalenderPendidikan" data-id="' + escapeHTML(r.id) + '" class="text-rose-500 hover:bg-rose-50 dark:hover:bg-gray-700 p-2 rounded-lg smooth-hover"><i class="fa-solid fa-trash pointer-events-none"></i></button>' +
+                    '</div>';
+                }
+                html += '</div>';
+                list.innerHTML = html;
+            }, function(err) {
+                list.innerHTML = '<div class="p-4 text-center text-rose-500">Gagal memuat kalender: ' + escapeHTML(err) + '</div>';
+            });
+        }
+
+        function simpanKalenderPendidikanModal() {
+            var mulai = document.getElementById('kaldik-mulai');
+            var selesai = document.getElementById('kaldik-selesai');
+            var jenis = document.getElementById('kaldik-jenis');
+            var efektif = document.getElementById('kaldik-efektif');
+            var ket = document.getElementById('kaldik-keterangan');
+            if (!mulai || !jenis) return;
+            var payload = {
+                mulai: mulai.value,
+                selesai: (selesai && selesai.value) ? selesai.value : mulai.value,
+                jenis: jenis.value,
+                efektif: efektif ? efektif.value : 'Tidak',
+                keterangan: ket ? ket.value : ''
+            };
+            if (!payload.mulai) return Swal.fire('Tanggal Kosong', 'Tanggal mulai wajib diisi.', 'warning');
+            Server.panggil('simpanKalenderPendidikan', [payload], function(res) {
+                if (res && res.status === 'success') {
+                    if (ket) ket.value = '';
+                    muatKalenderPendidikanModal();
+                    State.rekapLoaded = false;
+                    Swal.fire({toast: true, position: 'top-end', icon: 'success', title: res.message || 'Kalender tersimpan', showConfirmButton: false, timer: 1800});
+                } else {
+                    Swal.fire('Gagal', res ? (res.message || 'Gagal menyimpan kalender') : 'Gagal menyimpan kalender', 'error');
+                }
+            }, function(err) { Swal.fire('Error', String(err), 'error'); });
+        }
+
+        function hapusKalenderPendidikanModal(id) {
+            Swal.fire({ title: 'Hapus Kalender?', text: 'Data kalender pendidikan ini akan dihapus dari sistem.', icon: 'warning', showCancelButton: true, confirmButtonColor: '#ef4444', confirmButtonText: 'Ya, Hapus', background: document.documentElement.classList.contains('dark') ? '#1e293b' : '#ffffff', color: document.documentElement.classList.contains('dark') ? '#f1f5f9' : '#1f2937' }).then(function(r) {
+                if (!r.isConfirmed) return;
+                Server.panggil('hapusKalenderPendidikan', [id], function(res) {
+                    if (res && res.status === 'success') {
+                        muatKalenderPendidikanModal();
+                        State.rekapLoaded = false;
+                        Swal.fire({toast: true, position: 'top-end', icon: 'success', title: res.message || 'Kalender dihapus', showConfirmButton: false, timer: 1600});
+                    } else {
+                        Swal.fire('Gagal', res ? (res.message || 'Gagal menghapus kalender') : 'Gagal menghapus kalender', 'error');
+                    }
+                }, function(err) { Swal.fire('Error', String(err), 'error'); });
+            });
+        }
+
         function modalKenaikanKelas() {
             getDaftarKelasCache(function(dk) {
                 dk = dk || [];
@@ -1788,7 +1920,9 @@
                 document.getElementById('print-subtitle').innerText = "Periode: " + namaBulanTxt + " " + tahun + " | Kelas: " + (kelas === 'Semua' ? 'Semua Kelas' : kelas);
                 document.getElementById('print-subtitle-tahunan').innerText = "Tahun: " + tahun + " | Kelas: " + (kelas === 'Semua' ? 'Semua Kelas' : kelas);
                 
-                buildRekapTable(data, bulan, tahun);
+                var payloadRekap = data || {};
+                var rowsRekap = Array.isArray(payloadRekap) ? payloadRekap : (payloadRekap.rows || []);
+                buildRekapTable(rowsRekap, bulan, tahun, payloadRekap);
             }, function(err) {
                 btn.innerHTML = 'Tampilkan'; btn.disabled = false;
                 tbodyBulan.innerHTML = '<tr><td colspan="40" class="p-8 text-center text-rose-500">Error: ' + err + '</td></tr>';
@@ -1796,8 +1930,41 @@
             });
         }
 
-        function buildRekapTable(data, bulan, tahun) {
+        function renderInfoKalenderBulan(kalenderBulan, hariEfektifBulan, bulan, tahun) {
+            var box = document.getElementById('info-kaldik-bulanan');
+            if (!box) return;
+            kalenderBulan = kalenderBulan || {};
+            var items = [];
+            var seen = {};
+            Object.keys(kalenderBulan).sort(function(a, b){ return parseInt(a) - parseInt(b); }).forEach(function(day) {
+                var info = kalenderBulan[day];
+                if (!info || info.system) return;
+                var key = (info.jenis || '') + '|' + (info.keterangan || '');
+                if (seen[key]) { seen[key].push(day); return; }
+                seen[key] = [day];
+            });
+
+            for (var key in seen) {
+                var p = key.split('|');
+                items.push('<li><b>' + seen[key].join(', ') + ' ' + getNamaBulan(bulan) + '</b> - ' + escapeHTML(p[0] || 'Kalender') + ': ' + escapeHTML(p[1] || '-') + '</li>');
+            }
+
+            var html = '<div class="font-bold mb-1"><i class="fa-solid fa-calendar-check mr-1"></i> Kalender Pendidikan & Hari Efektif</div>' +
+                '<div>Hari efektif yang dipakai sebagai dasar persentase kehadiran bulan ini: <b>' + (hariEfektifBulan || 0) + ' hari</b>.</div>';
+            if (items.length > 0) html += '<ul class="list-disc ml-5 mt-1 space-y-0.5">' + items.join('') + '</ul>';
+            else html += '<div class="mt-1 text-sky-700 dark:text-sky-200">Tidak ada catatan kalender khusus pada bulan ini selain libur mingguan bawaan.</div>';
+            box.innerHTML = html;
+            box.classList.remove('hidden');
+        }
+
+        function buildRekapTable(data, bulan, tahun, meta) {
+            meta = meta || {};
             var daysInMonth = new Date(tahun, bulan, 0).getDate();
+            var kalenderBulan = meta.kalenderBulan || {};
+            var hariEfektifBulan = meta.hariEfektifBulan || 0;
+            State.kalenderBulanAktif = kalenderBulan;
+            State.hariEfektifBulanAktif = hariEfektifBulan;
+
             var theadBulan = document.getElementById('thead-rekap-bulanan');
             var tbodyBulan = document.getElementById('tbody-rekap-bulanan');
             var theadTahun = document.getElementById('thead-rekap-tahunan');
@@ -1805,17 +1972,19 @@
             var wrapHighlight = document.getElementById('rekap-highlight');
             var namaBulanTerpilih = getNamaBulan(bulan);
 
-            var thBulanHTML = '<tr><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 min-w-[30px] sticky left-0 top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[1px_0_0_#e2e8f0] text-[11px]">No</th><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 text-left min-w-[150px] sticky left-[30px] top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-[11px]">Nama Siswa</th><th colspan="' + daysInMonth + '" class="border border-gray-200 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 text-[11px]">' + namaBulanTerpilih + ' ' + tahun + '</th><th colspan="5" class="border border-gray-200 dark:border-gray-600 p-2 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 text-[11px]">Total Bulan Ini</th></tr><tr>';
+            renderInfoKalenderBulan(kalenderBulan, hariEfektifBulan, bulan, tahun);
+
+            var thBulanHTML = '<tr><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 min-w-[30px] sticky left-0 top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[1px_0_0_#e2e8f0] text-[11px]">No</th><th rowspan="2" class="border border-gray-200 dark:border-gray-600 p-2 text-left min-w-[150px] sticky left-[30px] top-0 bg-gray-100 dark:bg-gray-700 z-30 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] text-[11px]">Nama Siswa</th><th colspan="' + daysInMonth + '" class="border border-gray-200 dark:border-gray-600 p-2 bg-white dark:bg-gray-800 text-[11px]">' + namaBulanTerpilih + ' ' + tahun + '</th><th colspan="6" class="border border-gray-200 dark:border-gray-600 p-2 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 text-[11px]">Total Bulan Ini</th></tr><tr>';
 
             for (var i = 1; i <= daysInMonth; i++) {
-                var dateObj = new Date(tahun, bulan - 1, i);
-                var isHoliday = dateObj.getDay() === 5; 
-                var bgClass = isHoliday ? 'bg-red-100 dark:bg-red-900/60 text-red-600' : 'bg-white dark:bg-gray-800';
-                thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 w-6 min-w-[20px] ' + bgClass + ' sticky top-[33px] z-20 text-[10px]">' + i + '</th>';
+                var infoKal = kalenderBulan[i];
+                var isNonEffective = infoKal && infoKal.efektif === false;
+                var bgClass = isNonEffective ? 'bg-red-100 dark:bg-red-900/60 text-red-600' : (infoKal ? 'bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300' : 'bg-white dark:bg-gray-800');
+                var title = infoKal ? ' title="' + escapeHTML((infoKal.keterangan || infoKal.jenis || '') + (infoKal.efektif === false ? ' - Tidak dihitung hari efektif' : ' - Dihitung hari efektif')) + '"' : '';
+                thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 w-6 min-w-[20px] ' + bgClass + ' sticky top-[33px] z-20 text-[10px]"' + title + '>' + i + '</th>';
             }
-            
-            var rCols = ['H', 'TL', 'I', 'S', 'A'];
-            for(var c=0; c<5; c++) thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 min-w-[25px] bg-brand-50 dark:bg-brand-900/40 text-[10px] sticky top-[33px] z-20">' + rCols[c] + '</th>';
+            var rCols = ['H', 'TL', 'I', 'S', 'A', '%'];
+            for(var c=0; c<rCols.length; c++) thBulanHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 min-w-[25px] bg-brand-50 dark:bg-brand-900/40 text-[10px] sticky top-[33px] z-20">' + rCols[c] + '</th>';
             thBulanHTML += '</tr>';
             theadBulan.innerHTML = thBulanHTML;
 
@@ -1823,12 +1992,12 @@
             var bulanSingkat = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Ags', 'Sep', 'Okt', 'Nov', 'Des'];
             for(var m=0; m<12; m++) thTahunHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 bg-brand-50 dark:bg-brand-900/40 text-brand-800 dark:text-brand-300 w-12 text-[10px] sticky top-[33px] z-20">' + bulanSingkat[m] + '</th>';
             var colsFull = ['Hadir', 'Lambat', 'Izin', 'Sakit', 'Alpa'];
-            for(var c=0; c<5; c++) thTahunHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 w-12 text-[10px] sticky top-[33px] z-20">' + colsFull[c] + '</th>';
+            for(var cf=0; cf<5; cf++) thTahunHTML += '<th class="border border-gray-200 dark:border-gray-600 p-1 bg-emerald-50 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-300 w-12 text-[10px] sticky top-[33px] z-20">' + colsFull[cf] + '</th>';
             thTahunHTML += '</tr>';
             theadTahun.innerHTML = thTahunHTML;
 
             if (!data || data.length === 0) {
-                tbodyBulan.innerHTML = '<tr><td colspan="' + (daysInMonth + 7) + '" class="p-8 text-center text-gray-400">Tidak ada data untuk filter tersebut.</td></tr>';
+                tbodyBulan.innerHTML = '<tr><td colspan="' + (daysInMonth + 8) + '" class="p-8 text-center text-gray-400">Tidak ada data untuk filter tersebut.</td></tr>';
                 tbodyTahun.innerHTML = '<tr><td colspan="19" class="p-8 text-center text-gray-400">Tidak ada data untuk filter tersebut.</td></tr>';
                 return;
             }
@@ -1840,20 +2009,17 @@
 
             for (var j = 0; j < data.length; j++) {
                 var row = data[j];
-                
                 if (row.statBulan.H > maxHBulan) { maxHBulan = row.statBulan.H; terajinBulan = row.nama; valBulan = row.statBulan.H; }
                 if (row.statTahun.H > maxHTahun) { maxHTahun = row.statTahun.H; terajinTahun = row.nama; valTahun = row.statTahun.H; }
 
                 trBulanHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[1px_0_0_#e2e8f0] dark:shadow-[1px_0_0_#334155]">' + (j + 1) + '</td>';
-                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] truncate max-w-[150px] text-[10px] md:text-xs">' + row.nama + '</td>';
-
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 group-hover:bg-gray-50 dark:group-hover:bg-gray-700/50 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] truncate max-w-[150px] text-[10px] md:text-xs">' + escapeHTML(row.nama) + '</td>';
                 for (var d = 1; d <= daysInMonth; d++) {
                     var status = row.absensi[d];
-                    var cellTeks = ''; var cellBg = '';
-                    var dateObj = new Date(tahun, bulan - 1, d);
-                    var isHoliday = dateObj.getDay() === 5; 
-
+                    var cellTeks = ''; var cellBg = ''; var titleCell = '';
+                    var infoKal = kalenderBulan[d];
+                    if (infoKal) titleCell = ' title="' + escapeHTML((infoKal.keterangan || infoKal.jenis || '') + (infoKal.efektif === false ? ' - Tidak dihitung hari efektif' : ' - Dihitung hari efektif')) + '"';
                     if (status) {
                         var st = String(status).toLowerCase().trim();
                         if (st.indexOf('hadir') > -1 || st.indexOf('tepat waktu') > -1) { cellTeks = 'v'; cellBg = 'bg-[#c6f6d5] text-[#22543d] dark:bg-emerald-900/40 dark:text-emerald-300'; } 
@@ -1862,26 +2028,27 @@
                         else if (st.indexOf('sakit') > -1) { cellTeks = 'S'; cellBg = 'bg-[#bfdbfe] text-[#1e3a8a] dark:bg-brand-900/40 dark:text-brand-300'; }
                         else if (st.indexOf('alpa') > -1) { cellTeks = 'A'; cellBg = 'bg-[#fecdd3] text-[#be123c] dark:bg-rose-900/40 dark:text-rose-300'; }
                         else { cellTeks = '?'; cellBg = 'bg-gray-100 text-gray-500'; }
+                    } else if (infoKal) {
+                        cellTeks = kodeKalenderFront(infoKal);
+                        cellBg = (infoKal.efektif === false) ? 'bg-red-50 dark:bg-red-900/20 text-red-500' : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600';
                     } else {
-                        if (isHoliday) cellBg = 'bg-red-50 dark:bg-red-900/20 text-red-400';
-                        else cellBg = 'bg-transparent dark:bg-gray-800';
+                        cellBg = 'bg-transparent dark:bg-gray-800';
                     }
-                    trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 ' + cellBg + ' font-bold text-[9px] sm:text-xs text-center">' + cellTeks + '</td>';
+                    trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 ' + cellBg + ' font-bold text-[9px] sm:text-xs text-center"' + titleCell + '>' + cellTeks + '</td>';
                 }
-                
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-brand-700 bg-brand-50/50 dark:bg-brand-900/20 dark:text-brand-400">' + (row.statBulan.H || 0) + '</td>';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-amber-700 bg-amber-50/50 dark:bg-amber-900/20 dark:text-amber-400">' + (row.statBulan.TL || 0) + '</td>';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-orange-700 bg-orange-50/50 dark:bg-orange-900/20 dark:text-orange-400">' + (row.statBulan.I || 0) + '</td>';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-brand-700 bg-brand-50/50 dark:bg-brand-900/20 dark:text-brand-400">' + (row.statBulan.S || 0) + '</td>';
                 trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-rose-700 bg-rose-50/50 dark:bg-rose-900/20 dark:text-rose-400">' + (row.statBulan.A || 0) + '</td>';
+                trBulanHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-black text-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/20 dark:text-emerald-400">' + (row.persentaseBulan || 0) + '%</td>';
                 trBulanHTML += '</tr>';
 
                 trTahunHTML += '<tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 group">';
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 sticky left-0 bg-white dark:bg-gray-800 z-10">' + (j + 1) + '</td>';
-                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 z-10 truncate max-w-[150px] text-[10px] md:text-xs">' + row.nama + '</td>';
-                
-                for(var m=1; m<=12; m++) {
-                    var statM = row.statPerBulan[m];
+                trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-2 text-left font-medium sticky left-[30px] bg-white dark:bg-gray-800 z-10 truncate max-w-[150px] text-[10px] md:text-xs">' + escapeHTML(row.nama) + '</td>';
+                for(var mt=1; mt<=12; mt++) {
+                    var statM = row.statPerBulan[mt];
                     var cellIsi = '';
                     if(statM && (statM.H>0 || statM.TL>0 || statM.I>0 || statM.S>0 || statM.A>0)) {
                         cellIsi += '<div class="flex flex-col text-[7px] md:text-[9px] leading-tight text-left pl-1">';
@@ -1890,11 +2057,11 @@
                         if(statM.I > 0) cellIsi += '<span class="text-orange-600 font-bold">I:' + statM.I + '</span>';
                         if(statM.S > 0) cellIsi += '<span class="text-brand-500 font-bold">S:' + statM.S + '</span>';
                         if(statM.A > 0) cellIsi += '<span class="text-rose-600 font-bold">A:' + statM.A + '</span>';
+                        if(statM.HE > 0) cellIsi += '<span class="text-emerald-700 font-black border-t border-gray-100 mt-0.5 pt-0.5">' + (statM.P || 0) + '%</span>';
                         cellIsi += '</div>';
                     } else { cellIsi = '<span class="text-gray-300">-</span>'; }
                     trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 align-top bg-white dark:bg-gray-800">' + cellIsi + '</td>';
                 }
-                
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-emerald-700 bg-emerald-50/50 dark:bg-emerald-900/20 dark:text-emerald-400">' + (row.statTahun.H || 0) + '</td>';
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-amber-700 bg-amber-50/50 dark:bg-amber-900/20 dark:text-amber-400">' + (row.statTahun.TL || 0) + '</td>';
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-orange-700 bg-orange-50/50 dark:bg-orange-900/20 dark:text-orange-400">' + (row.statTahun.I || 0) + '</td>';
@@ -1902,7 +2069,6 @@
                 trTahunHTML += '<td class="border border-gray-200 dark:border-gray-600 p-1 font-bold text-[10px] text-rose-700 bg-rose-50/50 dark:bg-rose-900/20 dark:text-rose-400">' + (row.statTahun.A || 0) + '</td>';
                 trTahunHTML += '</tr>';
             }
-
             if (data.length > 0 && (maxHBulan > 0 || maxHTahun > 0)) {
                 wrapHighlight.classList.remove('hidden');
                 document.getElementById('terajin-bulan').innerText = (maxHBulan > 0) ? terajinBulan : '-';
@@ -1910,7 +2076,6 @@
                 document.getElementById('terajin-tahun').innerText = (maxHTahun > 0) ? terajinTahun : '-';
                 document.getElementById('stat-terajin-tahun').innerText = (maxHTahun > 0) ? (valTahun + ' Hari Hadir Tepat Waktu') : 'Belum ada data';
             } else wrapHighlight.classList.add('hidden');
-            
             tbodyBulan.innerHTML = trBulanHTML;
             tbodyTahun.innerHTML = trTahunHTML;
         }
@@ -2202,6 +2367,9 @@
             }
             else if (aksi === 'tambahKelas') tambahKelas();
             else if (aksi === 'modalKenaikanKelas') modalKenaikanKelas();
+            else if (aksi === 'modalKalenderPendidikan') modalKalenderPendidikan();
+            else if (aksi === 'simpanKalenderPendidikan') simpanKalenderPendidikanModal();
+            else if (aksi === 'hapusKalenderPendidikan') hapusKalenderPendidikanModal(elemen.getAttribute('data-id'));
             else if (aksi === 'modalInputIzin') modalInputIzin();
             else if (aksi === 'simpanPengaturanSistem') simpanPengaturanSistem();
             else if (aksi === 'tambahAdmin') { if(typeof Swal !== 'undefined') Swal.fire('Info', 'Tambahkan Admin di Google Sheets.', 'info'); else alert('Info: Tambahkan di Google Sheets'); }
@@ -2226,6 +2394,7 @@
             else if (aksi === 'ubahTahunDashboard') muatDashboard(true, elemen.value);
             else if (aksi === 'ubahKelasIndividu') muatDataSiswaUntukIndividu(elemen.value);
             else if (aksi === 'ubahSetupKelasWali') ubahSetupKelasWali(elemen);
+            else if (aksi === 'ubahTahunKalenderPendidikan') muatKalenderPendidikanModal();
         });
 
         window.addEventListener('DOMContentLoaded', function() {
